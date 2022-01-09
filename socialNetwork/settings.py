@@ -134,7 +134,7 @@ MEDIA_URL = "/media/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = "index"
+LOGIN_REDIRECT_URL = "post-list-view"
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 EMAIL_ACCOUNT_REQUIRED = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
