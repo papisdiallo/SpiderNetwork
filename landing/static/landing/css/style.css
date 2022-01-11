@@ -1477,6 +1477,20 @@ main {
 	font-size: 14px;
 	font-weight: 600;
 }
+/* label.custom-file-label.text-truncate {
+    display: none;
+} */
+.post-images {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    
+}
+
+.post-images__child img {
+    border-radius: 10px;
+    width: auto;
+}
 .ed-opts > a:hover {
 	color: #34011aed;
 }

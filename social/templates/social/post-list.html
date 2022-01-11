@@ -116,15 +116,15 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Creating Post</h5>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                            &times;
                         </button>
                 </div>       
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <form class="" method="post" id="createPostForm">
-                            {% csrf_token %}
-                            {{ form|crispy }}
-                        </form>
+                       {% crispy form %}
+                       <div id="PreviewImagesContainer">
+                           
+                       </div>
                     </div>
                 </div>
                 <div class="modal-footer float-right">

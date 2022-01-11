@@ -6,8 +6,8 @@ from .forms import PostForm
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-#from django_editorjs import EditorJsField
-from django.views.generics.edit import UpdateView, DeleteView
+from django.views.decorators.csrf import requires_csrf_token
+from django.core.files.storage import FileSystemStorage
 
 
 def is_ajax(request):
@@ -25,7 +25,10 @@ class PostListView(LoginRequiredMixin, View):
         form = PostForm(request.POST or None, request.FILES or None)
         response = {}
         if is_ajax(request=request) and form.is_valid():
+            print("form images", form.cleaned_data.get('images'))
             title = form.cleaned_data.get("title", "")
+            print("Title ", title)
+            print(form)
             post_instance = form.save(commit=False)
             post_instance.author = request.user
 
@@ -44,6 +47,7 @@ class PostEditView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST or None, request.FILES or None)
         if is_ajax(request=request) and form.is_valid():
+            pass
 
 
 def UserProfile(request):

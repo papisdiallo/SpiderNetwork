@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.template.defaultfilters import slugify
+from django_editorjs import EditorJsField
+
 
 
 class Tags(models.Model):
@@ -15,7 +17,7 @@ class Tags(models.Model):
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    images = models.ManyToManyField(Files, null=True, blank=True)
+    images = models.ManyToManyField('Files', blank=True)
     content = models.TextField()
     post_slug = models.SlugField(blank=True, null=True)
     date_updated = models.DateTimeField(auto_now=True)
