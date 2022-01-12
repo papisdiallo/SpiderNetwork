@@ -2,37 +2,51 @@ $(document).ready(function () {
     $("button[data-bs-dismiss='modal']").on("click", (e) => {
         var form = $(e.target).parent().parent().find(".modal-body").find("form");
         $(form)[0].reset()
+        $("#PreviewImagesContainer").html("")
     });
-    $("#createPostModal").on("keyup", (e) => {
+    $("#CreatePostModal").on("keyup", (e) => {
         if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") return;
         if (e.target.classList.contains("is-invalid")) {
-            console.log("this is invalid class");
+
             e.target.classList.remove("is-invalid");
         }
     })
-    $("#createPostModal").on("click", (e) => {
+    $("#CreatePostModal").on("click", (e) => {
         if ($(e.target).attr("id") !== "createPostBtn") return;
         e.preventDefault();
         e.target.setAttribute("disabled", true);
         $(e.target.nextElementSibling).fadeIn()
+        var form = $("#createPostForm")[0]
+        console.log(form)
+        var data = new FormData($('form').get(0));
+        data.append("image", $("#id_images")[0].files[0]);
+        var other_data = form.serializeArray();
+        $.each(other_data, function (key, input) {
+            data.append(input.name, input.value);
+        });
+        // for (var i = 0; i < imageFiles.length; i++) {
+        //     _form_data.append('images', i);
+        // }
+        var data = $("#createPostForm").serialize();
         $.ajax({
-            url: $("#createPostModal").attr("data-url"),
-            data: $("#createPostModal #createPostForm").serialize(),
+            url: $("#CreatePostModal").attr("data-url"),
+            data: data, //$("#CreatePostModal #createPostForm").serialize(),
             method: "post",
             dataType: "json",
             success: (data) => {
                 if (data.success) {
                     setTimeout(() => {
                         $(e.target).next().fadeOut();
-                        $("#createPostForm")[0].reset();
-                        $("#createPostModal").modal('hide')
+                        ResetForm('createPostForm', 'PreviewImagesContainer')
+                        $("#CreatePostModal").modal('hide')
                         $(e.target.nextElementSibling).fadeOut()
                         alertUser("Post", "has been created successfully!")// alerting the user 
                     }, 1000)
                     console.log(data.title)
                 } else {
                     $("#createPostForm").replaceWith(data.formErrors);
-                    $("#createPostModal").find("form").attr("id", "createPostForm");
+                    $("#PreviewImagesContainer").html("");
+                    $("#CreatePostModal").find("form").attr("id", "createPostForm");
                     $(e.target.nextElementSibling).fadeOut()
                 };
 
@@ -44,46 +58,78 @@ $(document).ready(function () {
         })
     });
 
-    var postImagesInput = document.getElementById("id_images");
+    // var postImagesInput = document.getElementById("id_images");
     var postImagesPreviewContainer = document.getElementById("PreviewImagesContainer")
-    postImagesInput.onchange = (e) => {
+    let imageFiles = []
+    $("#CreatePostModal").on('change', (e) => {
+        $(postImagesPreviewContainer).html("")
+        if ($(e.target).attr("id") !== "id_images") return;
+        var filenames = "";
+        for (let i = 0; i < e.target.files.length; i++) {
+            filenames += (i > 0 ? ", " : "") + e.target.files[i].name;
+        }
+        e.target.parentNode.querySelector('.custom-file-label').textContent = filenames;
+
         //why is the this element returning the document and not the target itself
         // check the length of the files to know what template to make
-        var numberOfImages = e.target.files.length
-        if (numberOfImages > 4) return;
+        const files = e.target.files
+        const numberOfImages = files.length
+        let gridColumnSize;
+        if (numberOfImages > 4 | numberOfImages === 0) return;
         var row = document.createElement("div")
         row.setAttribute("class", "post-images")
-        if (numberOfImages === 2) {
+        if (numberOfImages === 2 | numberOfImages === 3) {
             row.style.gridTemplateColumns = "repeat(2, 1fr)";
-        } else if (numberOfImages === 3) {
-            row.style.gridTemplateColumns = "repeat(2, 1fr)";
-
-        } else if (numberOfImages === 4) {
+            gridColumnSize = 3
+        } else {
             row.style.gridTemplateColumns = "repeat(3, 1fr)";
-
+            gridColumnSize = 4
         }
-        for (file of e.target.files) {
+        for (file of files) {
+            imageFiles.push(file)
             const postImageChild = document.createElement("div");
-            postImageChild.setAttribute("class", "post-images__child")
+            postImageChild.setAttribute("class", "post-images__child_down")
             const reader = new FileReader();
             reader.onload = () => {
                 img = document.createElement("img")
                 img.setAttribute("src", reader.result)
-                $(postImageChild).append(img)
+
+                img.onload = (e) => {
+                    // here i will process on resizing the image
+                    const canvas = document.createElement("canvas")
+                    const max_width = 680
+                    const scaleSize = max_width / e.target.width
+                    canvas.width = max_width
+                    canvas.height = e.target.height * scaleSize
+                    var ctx = canvas.getContext("2d") // setting the context of the canvas
+                    ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height)
+                    const encodedSource = ctx.canvas.toDataURL(e.target, 'image/png', 1)
+                    const processedImg = document.createElement("img") // create a processed image and return it.
+                    processedImg.src = encodedSource
+                    $(postImageChild).append(processedImg)
+
+                }
             }
             $(row).prepend(postImageChild)
             $(postImagesPreviewContainer).append(row);
             reader.readAsDataURL(file)
         }
-        $(".post-images div:nth-child(1)").css(
-            "grid-column", "1 / 4"
-        )
+        $(".post-images div:nth-child(1)").css({
+            "grid-column": "1 / " + (gridColumnSize).toString(),
+        }
+        ).removeClass("post-images__child_down").addClass("post-images__child")
 
-    }
+    });
+
+
 })
 function alertUser(key, message) {
     alertify.set('notifier', 'position', 'top-right');
     alertify.set('notifier', 'delay', 7);
     alertify.success(`${key}  ${message}`);
 
+}
+function ResetForm(formId, imagePreviewId) {
+    $("#" + formId)[0].reset()
+    $("#" + imagePreviewId).html("")
 }

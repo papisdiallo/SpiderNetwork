@@ -1477,19 +1477,26 @@ main {
 	font-size: 14px;
 	font-weight: 600;
 }
-/* label.custom-file-label.text-truncate {
+label.custom-file-label.text-truncate {
     display: none;
-} */
+}
+
+input#submit-id-editproject {
+    background-color: #42132a;
+}
 .post-images {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     
 }
-
-.post-images__child img {
+.post-images__child_down {
+	max-height: 180px;
+}
+.post-images__child img, .post-images__child_down img {
     border-radius: 10px;
     width: auto;
+	height: 100%;
 }
 .ed-opts > a:hover {
 	color: #34011aed;
@@ -7079,23 +7086,26 @@ ul#myTab {
   opacity: 1;
   margin-left: 140px;
   margin-bottom: 10px;
+  width: 123px !important;
 }
 .custom-file-input::-webkit-file-upload-button {
   visibility: hidden;
 }
 .custom-file-input::before {
-  content: 'Select Files';
-  color: #fff;
-  display: inline-block;
-  border: 1px solid #e5e5e5;
-  border-radius: 3px;
-  background: #34011aed; 
-  font-weight: 500;
-  padding: 10px 15px;
-  outline: none;
-  white-space: nowrap;
-  -webkit-user-select: none;
-  cursor: pointer;
+    content: 'Add Images';
+    color: #fff;
+    display: inline-block;
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    background: #34011aed;
+    font-weight: 500;
+    padding: 5px 15px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    right: 0;
+    letter-spacing: .03rem;
 }
 .custom-file-input:hover::before {
   background-color: #34011aed;

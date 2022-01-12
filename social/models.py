@@ -5,7 +5,6 @@ from django.template.defaultfilters import slugify
 from django_editorjs import EditorJsField
 
 
-
 class Tags(models.Model):
     name = models.CharField(max_length=200)
     tag_slug = models.SlugField()
@@ -15,9 +14,13 @@ class Tags(models.Model):
         return self.name
 
 
+class Files(models.Model):
+    image = models.ImageField(upload_to="post/images")
+
+
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    images = models.ManyToManyField('Files', blank=True)
+    images = models.ManyToManyField(Files)
     content = models.TextField()
     post_slug = models.SlugField(blank=True, null=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -39,7 +42,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author}'s comment"
-
-
-class Files(models.Model):
-    image = models.ImageField(upload_to="post/images")

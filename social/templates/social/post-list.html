@@ -110,14 +110,14 @@
     {% endblock rightContent %}
     {% block content %}
         <!-- create post modal -->
-        <div class="modal fade" id="createPostModal" data-url="{% url 'post-list-view' %}" tabindex="-1">
+        <div class="modal fade" id="CreatePostModal" data-url="{% url 'post-list-view' %}" tabindex="-1">
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Creating Post</h5>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             &times;
-                        </button>
+                        </button> 
                 </div>       
                 <div class="modal-body">
                     <div class="container-fluid">
@@ -144,8 +144,8 @@
         </div>
         <div class="post-st">
             <ul>
-                <li><a class="post_project" href="#" title="">Post a Job</a></li>
-                <li><a class="post-jb active" role="button" data-bs-toggle="modal"  href="#createPostModal">Post</a></li>
+                <li><a class="post_project" href="{% url 'post-list-view' %}" title="">Post a Job</a></li>
+                <li><a class="post-jb active" data-bs-toggle="modal" href="#CreatePostModal">Post</a></li>
             </ul>
         </div>
         </div>
@@ -181,7 +181,7 @@
         <div class="job_descp">
         <h3>Senior Wordpress Developer</h3>
         <ul class="job-dt">
-        <li><a href="#" title="">Full Time</a></li>
+        <li><a href="{% url 'post-create-view' %}" title="">Full Time</a></li>
         <li><span>$30 / hr</span></li>
         </ul>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus hendrerit metus, ut ullamcorper quam finibus at. Etiam id magna sit amet... <a href="#" title="">view more</a></p>

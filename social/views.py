@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
 from .models import Post
@@ -23,24 +24,47 @@ class PostListView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST or None, request.FILES or None)
-        response = {}
+        result = {}
+        files = request.FILES
+        print(files)
         if is_ajax(request=request) and form.is_valid():
-            print("form images", form.cleaned_data.get('images'))
-            title = form.cleaned_data.get("title", "")
-            print("Title ", title)
-            print(form)
+            print("the request is ajax and the form is valid")
+            title = form.cleaned_data.get("content", "")
             post_instance = form.save(commit=False)
             post_instance.author = request.user
+            result['success'] = True
+            return JsonResponse(result)
+        else:
+            result['success'] = False
+            csrf_cxt = {}
+            csrf_cxt.update(csrf(request))
+            print("the form is not valid")
+            formErrors = render_crispy_form(form, context=csrf_cxt)
+            result['formErrors'] = formErrors
+            return JsonResponse(result)
+        context = {"form": form, }
 
-            response["title"] = title
-            response["success"] = True
-            return JsonResponse(response)
-        response["success"] = False
-        cxt_csrf = {}
-        cxt_csrf.update(csrf(request))
-        formErrors = render_crispy_form(form, context=cxt_csrf)
-        response["formErrors"] = formErrors
-        return JsonResponse(response)
+        return render(request, 'social/post-create.html', context)
+
+
+class PostCreateView(View):
+    def get(self, request, *args, **kwargs):
+        form = PostForm()
+        posts = Post.objects.all().order_by("-date_posted")
+        context = {"posts": posts, "form": form}
+        return render(request, 'social/post-create.html', context)
+
+    def post(self, request, *args, **kwargs):
+        result = dict()
+        form = PostForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            print("form valid")
+            print(request.FILES)
+            result["success"] = True
+            return JsonResponse(result)
+        posts = Post.objects.all().order_by("-date_posted")
+        context = {"posts": posts, "form": form}
+        return render(request, 'social/post-create.html', context)
 
 
 class PostEditView(LoginRequiredMixin, View):
