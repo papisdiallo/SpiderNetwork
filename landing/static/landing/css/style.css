@@ -1485,18 +1485,18 @@ input#submit-id-editproject {
     background-color: #42132a;
 }
 .post-images {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    display: flex;
+	/* flex-wrap: wrap; */
+    gap: 3px;
     
 }
-.post-images__child_down {
-	max-height: 180px;
-}
+
 .post-images__child img, .post-images__child_down img {
-    border-radius: 10px;
-    width: auto;
+    width: 100%;
 	height: 100%;
+	border: 1px solid #a6a6a7;
+    border-radius: 5px;
+
 }
 .ed-opts > a:hover {
 	color: #34011aed;

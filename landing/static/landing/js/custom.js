@@ -17,21 +17,20 @@ $(document).ready(function () {
         e.target.setAttribute("disabled", true);
         $(e.target.nextElementSibling).fadeIn()
         var form = $("#createPostForm")[0]
-        console.log(form)
-        var data = new FormData($('form').get(0));
-        data.append("image", $("#id_images")[0].files[0]);
-        var other_data = form.serializeArray();
-        $.each(other_data, function (key, input) {
-            data.append(input.name, input.value);
-        });
-        // for (var i = 0; i < imageFiles.length; i++) {
-        //     _form_data.append('images', i);
-        // }
-        var data = $("#createPostForm").serialize();
+        var data = new FormData(form);
+        console.log("this is the data", data)
+        for (var i = 0; i < imageFiles.length; i++) {
+            console.log(imageFiles[i])
+            data.append('images', imageFiles[i]);
+        };
+
         $.ajax({
             url: $("#CreatePostModal").attr("data-url"),
             data: data, //$("#CreatePostModal #createPostForm").serialize(),
             method: "post",
+            processData: false,
+            cache: false,
+            contentType: false,
             dataType: "json",
             success: (data) => {
                 if (data.success) {
@@ -42,7 +41,7 @@ $(document).ready(function () {
                         $(e.target.nextElementSibling).fadeOut()
                         alertUser("Post", "has been created successfully!")// alerting the user 
                     }, 1000)
-                    console.log(data.title)
+
                 } else {
                     $("#createPostForm").replaceWith(data.formErrors);
                     $("#PreviewImagesContainer").html("");
@@ -75,18 +74,12 @@ $(document).ready(function () {
         const files = e.target.files
         const numberOfImages = files.length
         let gridColumnSize;
-        if (numberOfImages > 4 | numberOfImages === 0) return;
+        if (numberOfImages > 5 | numberOfImages === 0) return;
         var row = document.createElement("div")
         row.setAttribute("class", "post-images")
-        if (numberOfImages === 2 | numberOfImages === 3) {
-            row.style.gridTemplateColumns = "repeat(2, 1fr)";
-            gridColumnSize = 3
-        } else {
-            row.style.gridTemplateColumns = "repeat(3, 1fr)";
-            gridColumnSize = 4
-        }
+
         for (file of files) {
-            imageFiles.push(file)
+
             const postImageChild = document.createElement("div");
             postImageChild.setAttribute("class", "post-images__child_down")
             const reader = new FileReader();
@@ -103,21 +96,23 @@ $(document).ready(function () {
                     canvas.height = e.target.height * scaleSize
                     var ctx = canvas.getContext("2d") // setting the context of the canvas
                     ctx.drawImage(e.target, 0, 0, canvas.width, canvas.height)
-                    const encodedSource = ctx.canvas.toDataURL(e.target, 'image/png', 1)
+                    const encodedSource = ctx.canvas.toDataURL(e.target, 'image/png')
                     const processedImg = document.createElement("img") // create a processed image and return it.
                     processedImg.src = encodedSource
                     $(postImageChild).append(processedImg)
-
+                    imageFiles.push(processedImg)
                 }
             }
             $(row).prepend(postImageChild)
             $(postImagesPreviewContainer).append(row);
             reader.readAsDataURL(file)
         }
-        $(".post-images div:nth-child(1)").css({
-            "grid-column": "1 / " + (gridColumnSize).toString(),
+        if (numberOfImages !== 2) {
+            $(".post-images div:nth-child(1)").css({
+                "grid-column": "1 / " + (gridColumnSize).toString(),
+            })
         }
-        ).removeClass("post-images__child_down").addClass("post-images__child")
+        $(".post-images div:nth-child(1)").removeClass("post-images__child_down").addClass("post-images__child")
 
     });
 

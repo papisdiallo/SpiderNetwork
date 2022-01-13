@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
-from .models import Post
+from .models import Post, Files
 from .forms import PostForm
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
@@ -25,14 +25,19 @@ class PostListView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST or None, request.FILES or None)
         result = {}
-        files = request.FILES
-        print(files)
+        files = request.FILES.getlist('images')
         if is_ajax(request=request) and form.is_valid():
-            print("the request is ajax and the form is valid")
-            title = form.cleaned_data.get("content", "")
-            post_instance = form.save(commit=False)
-            post_instance.author = request.user
+            post_obj = form.save(commit=False)
+            post_obj.author = request.user
+            post_obj.save()
+            for file in files:
+                new_img = Files(image=file)
+                new_img.save()
+                post_obj.images.add(new_img)
+            post_obj.save()
+
             result['success'] = True
+
             return JsonResponse(result)
         else:
             result['success'] = False

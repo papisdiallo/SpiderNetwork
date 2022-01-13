@@ -29,9 +29,10 @@ class Post(models.Model):
     def __str__(self):
         return f"{self.author}'s post"
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.slug = slugify(self.title)
+    # def save(self, *args, **kwargs):
+    #     if not self.id:
+    #         self.slug = slugify(self.content)
+    #     return super(Post, self).save(*args, **kwargs)
 
 
 class Comment(models.Model):
