@@ -1,6 +1,7 @@
 {% extends 'landing/partials/base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% load createDivOnlyOnce %}
 {% block header %} {% include 'landing/partials/header.html' %}{% endblock header %} 
 
     {% block rightContent %}
@@ -122,9 +123,12 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                        {% crispy form %}
-                       <div id="PreviewImagesContainer">
+                       <div class="PreviewImagesContainer">
                            
                        </div>
+                       <div class="maxFileError">
+                        <p class="errornote">You cannot upload more than 5 images</p>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer float-right">
@@ -137,75 +141,130 @@
             </div>
         </div>
         <!-- end of create post modal -->
+                <!-- update post modal -->
+        <div class="modal fade" id="UpdatePostModal"  tabindex="-1">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Updating Post</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            &times;
+                        </button> 
+                </div>       
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        
+                        <div class="PreviewImagesContainer">
+                            <div class="spinner">
+                                <div class="bounce1"></div>
+                                <div class="bounce2"></div>
+                                <div class="bounce3"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+                <div class="modal-footer float-right">
+                    <button type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="createPostForm" id="createPostBtn" class="btn btn-sm btn-primary">Post</button>
+                    <span class="loading-icon"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                </div>
+                
+            </div>
+            </div>
+        </div>
+        <!-- end of update post modal -->
     <div class="main-ws-sec">
         <div class="post-topbar">
-        <div class="user-picy">
-        <img src="{% static 'landing/images/user-pic' %}.png" alt="">
-        </div>
-        <div class="post-st">
-            <ul>
-                <li><a class="post_project" href="{% url 'post-list-view' %}" title="">Post a Job</a></li>
-                <li><a class="post-jb active" data-bs-toggle="modal" href="#CreatePostModal">Post</a></li>
-            </ul>
-        </div>
+            <div class="user-picy">
+                <img src="{% static 'landing/images/user-pic' %}.png" alt="">
+            </div>
+            <div class="post-st">
+                <ul>
+                    <li><a class="post_project" href="{% url 'post-list-view' %}" title="">Post a Job</a></li>
+                    <li><a class="post-jb active" data-bs-toggle="modal" href="#CreatePostModal">Post</a></li>
+                </ul>
+            </div>
         </div>
         <div class="posts-section">
-        <div class="post-bar">
-        <div class="post_topbar">
+            {% for post in posts %} 
+                <div class="post-bar">
+                <div class="post_topbar">
 
-        <div class="usy-dt">
-        <img src="{% static 'landing/images/us-pic' %}.png" alt="">
-        <div class="usy-name">
-        <h3>John Doe</h3>
-        <span><img src="images/clock.png" alt="">3 min ago</span>
-        </div>
-        </div>
-        <div class="ed-opts">
-        <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
-        <ul class="ed-options">
-        <li><a href="#" title=""><i class="fas fa-edit mr-2"></i> Edit Post</a></li>
-        <li><a href="#" title=""><i class="fa fa-eye-slash mr-2"></i>Hide</a></li>
-        <li><a href="#" title=""> <i class="fas fa-trash-alt mr-2"></i>Delete </a></li>
-        </ul>
-        </div>
-        </div>
-        <div class="epi-sec">
-        <ul class="descp">
-        <li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
-        <li><img src="images/icon9.png" alt=""><span>India</span></li>
-        </ul>
-        <ul class="bk-links">
-        <li><a href="#" title=""><i class="fa fa-bookmark"></i></a></li>
-        <li><a href="#" title=""><i class="fa fa-envelope"></i></a></li>
-        </ul>
-        </div>
-        <div class="job_descp">
-        <h3>Senior Wordpress Developer</h3>
-        <ul class="job-dt">
-        <li><a href="{% url 'post-create-view' %}" title="">Full Time</a></li>
-        <li><span>$30 / hr</span></li>
-        </ul>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus hendrerit metus, ut ullamcorper quam finibus at. Etiam id magna sit amet... <a href="#" title="">view more</a></p>
-        <ul class="skill-tags">
-        <li><a href="#" title="">HTML</a></li>
-        <li><a href="#" title="">PHP</a></li>
-        <li><a href="#" title="">CSS</a></li>
-        <li><a href="#" title="">Javascript</a></li>
-        <li><a href="#" title="">Wordpress</a></li>
-        </ul>
-        </div>
-        <div class="job-status-bar">
-        <ul class="like-com">
-        <li>
-        <a href="#"><i class="fas fa-heart"></i> Like</a>
-        <img src="images/liked-img.png" alt="">
-        <span>25</span>
-        </li>
-        <li><a href="#" class="com"><i class="fas fa-comment-alt"></i> Comment 15</a></li>
-        </ul>
-        <a href="#"><i class="fas fa-eye"></i>Views 50</a>
-        </div>
-        </div>
+                <div class="usy-dt">
+                <img src="{{post.author.profile.avatar.url}}" alt="post author">
+                <div class="usy-name">
+                <h3>{{post.author.username}}</h3>
+                <span><i class="fa fa-clock-o" aria-hidden="true"></i>{{post.date_posted|timesince}} ago</span>
+                </div>
+                </div>
+                <div class="ed-opts">
+                <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
+                <ul class="ed-options">
+                <li><a data-bs-toggle="modal" id="{{post.post_slug}}" href="#UpdatePostModal" role="button"><i class="fas fa-edit mr-2"></i> Edit Post</a></li>
+                <li><a href="#" title=""><i class="fa fa-eye-slash mr-2"></i>Hide</a></li>
+                <li><a href="#" title=""> <i class="fas fa-trash-alt mr-2"></i>Delete </a></li>
+                </ul>
+                </div>
+                </div>
+                <div class="epi-sec">
+                <ul class="descp">
+                <li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
+                <li><img src="images/icon9.png" alt=""><span>India</span></li>
+                </ul>
+                <ul class="bk-links">
+                <li><a href="#" title=""><i class="fa fa-share" aria-hidden="true"></i></a></li>
+                <li class="follow"><span>Follow</span></li>
+                </ul>
+                </div>
+                <div class="job_descp">  
+                    <p> {{post.content}}<a href="#" title="">view more</a></p>
+                    {% for image in post.images.all %}
+                        {% if forloop.first %}
+                            <div class="PreviewImagesContainer">
+                            <div class="post-images reverse">
+                        {% endif %}
+                        
+                        {% if forloop.counter|create_second_div_once %}
+                                <div class="second_child_row">
+                                    {% for image in post.images.all %}
+                                        {% if not forloop.counter|divisibleby:3 and not forloop.counter|divisibleby:5 %}
+                                            <div class="post-images__child">
+                                                <img src="{{image.image.url}}" alt="post-image" />
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                        {% endif %}
+
+                        {% if forloop.counter|create_first_div_once %}
+                                <div class="second_child_row">
+                                    {% for image in post.images.all %}
+                                        {% if forloop.counter|divisibleby:3 or forloop.counter|divisibleby:5 %}
+                                            <div class="post-images__child">
+                                                <img src="{{image.image.url}}" alt="post-image" />
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                        {% endif %}
+
+                        {% if forloop.last %}</div></div>{% endif %}
+                    {% endfor %}
+                </div>
+                <div class="job-status-bar">
+                <ul class="like-com">
+                <li>
+                <a href="#"><i class="fas fa-heart"></i> Like</a>
+                <img src="images/liked-img.png" alt="">
+                <span>25</span>
+                </li>
+                <li><a href="#" class="com"><i class="fas fa-comment-alt"></i> Comment 15</a></li>
+                </ul>
+                <a href="#"><i class="fas fa-eye"></i>Views 50</a>
+                </div>
+                </div>
+            {% endfor %}
         <div class="top-profiles">
         <div class="pf-hd">
         <h3>Top Profiles</h3>
@@ -280,26 +339,27 @@
         </div>
         </div>
         </div>
+        
         <div class="post-bar">
-        <div class="post_topbar">
-        <div class="usy-dt">
-        <img src="{% static 'landing/images/us-pic' %}.png" alt="">
-        <div class="usy-name">
-        <h3>John Doe</h3>
-        <span><img src="images/clock.png" alt="">3 min ago</span>
-        </div>
-        </div>
-        <div class="ed-opts">
-        <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
-        <ul class="ed-options">
-        <li><a href="#" title="">Edit Post</a></li>
-        <li><a href="#" title="">Unsaved</a></li>
-        <li><a href="#" title="">Unbid</a></li>
-        <li><a href="#" title="">Close</a></li>
-        <li><a href="#" title="">Hide</a></li>
-        </ul>
-        </div>
-        </div>
+            <div class="post_topbar">
+                <div class="usy-dt">
+                    <img src="{% static 'landing/images/us-pic' %}.png" alt="">
+                <div class="usy-name">
+                <h3>John Doe</h3>
+                <span><img src="images/clock.png" alt="">3 min ago</span>
+            </div>
+            </div>
+            <div class="ed-opts">
+                <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
+                <ul class="ed-options">
+                    <li><a href="#" title="">Edit Post</a></li>
+                    <li><a href="#" title="">Unsaved</a></li>
+                    <li><a href="#" title="">Unbid</a></li>
+                    <li><a href="#" title="">Close</a></li>
+                    <li><a href="#" title="">Hide</a></li>
+                </ul>
+            </div>
+            </div>
         <div class="epi-sec">
         <ul class="descp">
         <li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>

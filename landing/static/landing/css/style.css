@@ -1428,6 +1428,7 @@ main {
 	-o-border-radius: 100px;
 	border-radius: 100px;
 	margin-top: 2px;
+	width: 60px;
 }
 .ed-opts {
 	float: right;
@@ -1477,6 +1478,11 @@ main {
 	font-size: 14px;
 	font-weight: 600;
 }
+#CreatePostModal .modal-body,
+#UpdatePostModal .modal-body {
+	max-height: 470px;
+	overflow-y: auto;
+}
 label.custom-file-label.text-truncate {
     display: none;
 }
@@ -1486,9 +1492,21 @@ input#submit-id-editproject {
 }
 .post-images {
     display: flex;
-	/* flex-wrap: wrap; */
-    gap: 3px;
-    
+	flex-direction: column;   
+}
+.post-images.reverse{
+	flex-flow: column-reverse;
+}
+.post-images div {
+	display: flex;
+	gap: 3px;
+	margin-bottom: 1px;
+}
+.post-images div:first-child() {
+	margin-top: 10px
+}
+.post-images div:last-child() {
+	margin-bottom: 10px
 }
 
 .post-images__child img, .post-images__child_down img {
@@ -1583,7 +1601,7 @@ input#submit-id-editproject {
 }
 .bk-links li i {
 	color: #fff;
-	font-size: 24px;
+	font-size: 16px;
 	width: 33px;
 	height: 30px;
 	padding-left: 0px;
@@ -7084,15 +7102,39 @@ ul#myTab {
 .custom-file-input {
   color: transparent;
   opacity: 1;
-  margin-left: 140px;
+  margin-left: 100px;
   margin-bottom: 10px;
-  width: 123px !important;
+  width: 250px !important;
+}
+li.follow {
+	background: #51a5fb;
+    color: white;
+    padding: 7px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: .03rem;
+}
+.maxFileError {
+	display:none;
+}
+.maxFileError .errornote {
+	
+    font-size: 14px;
+    font-weight: 700;
+    display: block;
+    padding: 10px 12px;
+    margin: 0 0 10px 0;
+    color: #e35f5f;
+    border: 1px solid #e35f5f;
+    border-radius: 4px;
+    background-position: 5px 12px;
+    overflow-wrap: break-word;
 }
 .custom-file-input::-webkit-file-upload-button {
   visibility: hidden;
 }
 .custom-file-input::before {
-    content: 'Add Images';
+    content: 'Add Images to your post ';
     color: #fff;
     display: inline-block;
     border: 1px solid #e5e5e5;

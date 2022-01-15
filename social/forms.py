@@ -42,5 +42,5 @@ class PostForm(forms.ModelForm):
         self.helper.layout = Layout(
             Field("content"),
             Field("images"),
-            Submit("post-create", "Post")
+            # Submit("post-create", "Post")
         )
