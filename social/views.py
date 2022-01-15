@@ -79,11 +79,18 @@ class UpdatePostView(LoginRequiredMixin, View):
                         request.FILES or None, instance=post)
         result = {}
         files = request.FILES.getlist("images")
-        print(files)
+
         if is_ajax(request=request) and form.is_valid():
-            print(post.images.all().values("image"))
-            form.save()
-            # form.save_m2m()
+
+            post_obj = form.save()
+            Files.objects.filter(post=post).delete()
+            post.images.clear()  # clearing all the old instances
+            for img in files:
+                img = Files(image=img)
+                img.save()
+                post.images.add(img)
+            post_obj.save()
+
             print("the request is ajax and the form is valid")
             result["success"] = True
             return JsonResponse(result)
