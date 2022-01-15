@@ -4,7 +4,6 @@ $(document).ready(function () {
 
     $("button[data-bs-dismiss='modal']").on("click", (e) => {
         var form = $(e.target).parent().parent().find(".modal-body").find("form");
-        console.log(form)
         form.length !== 0 ? $(form)[0].reset() : "";
         $("#PreviewImagesContainer").html("")
     });
@@ -16,9 +15,11 @@ $(document).ready(function () {
         }
     })
     modalsId.forEach((_id, index) => {
-        $(`_id`).on("click", (e) => {
+        $(`${_id}`).on("click", (e) => {
+            console.log(e.target.id)
             if ($(e.target).attr("id") !== "createPostBtn") return;
             e.preventDefault();
+            $(e.target.nextElementSibling).fadeIn()
             e.target.setAttribute("disabled", true);
             var form = $(`${_id} #createPostForm`)[0]
             var data = new FormData(form);
@@ -65,63 +66,18 @@ $(document).ready(function () {
         });
 
     })
-    $("#CreatePostModal").on("click", (e) => {
-        if ($(e.target).attr("id") !== "createPostBtn") return;
-        e.preventDefault();
-        e.target.setAttribute("disabled", true);
-        $(e.target.nextElementSibling).fadeIn()
-        var form = $("#createPostForm")[0]
-        var data = new FormData(form);
-        console.log("this is the data", data)
-        for (var i = 0; i < imageFiles.length; i++) {
-            console.log(imageFiles[i])
-            data.append('images', imageFiles[i]);
-        };
-
-        $.ajax({
-            url: $("#CreatePostModal").attr("data-url"),
-            data: data, //$("#CreatePostModal #createPostForm").serialize(),
-            method: "post",
-            processData: false,
-            cache: false,
-            contentType: false,
-            dataType: "json",
-            success: (data) => {
-                if (data.success) {
-                    setTimeout(() => {
-                        $(e.target).next().fadeOut();
-                        ResetForm('createPostForm', 'PreviewImagesContainer')
-                        $("#CreatePostModal").modal('hide')
-                        $(e.target.nextElementSibling).fadeOut()
-                        alertUser("Post", "has been created successfully!")// alerting the user 
-                    }, 1000)
-
-                } else {
-                    $("#createPostForm").replaceWith(data.formErrors);
-                    $("#PreviewImagesContainer").html("");
-                    $("#CreatePostModal").find("form").attr("id", "createPostForm");
-                    $(e.target.nextElementSibling).fadeOut()
-                };
-
-                $(e.target).prop("disabled", false);
-            },
-            error: (error) => {
-                console.log(error)
-            }
-        })
-    });
 
     // var postImagesInput = document.getElementById("id_images");
 
     modalsId.forEach((_id, index) => {
         $(`${_id}`).on("change", (e) => {
-            // if ($(e.target).attr("id") !== "id_images") return;
+            if ($(e.target).attr("id") !== "id_images") return;
             console.log("just passed the test fo the id")
             var postImagesPreviewContainer = document.querySelector(`${_id} .PreviewImagesContainer`);
             $(`${_id} .maxFileError`).fadeOut()
             $(postImagesPreviewContainer).html("");
-            console.log(e.target.files)
-            if (e.target.files.length > 5) {
+            console.log($(e.target))
+            if ($(e.target.files.length) > 5) {
                 $(`${_id} .maxFileError`).fadeIn()
                 return;
             }
@@ -173,12 +129,10 @@ $(document).ready(function () {
     $(".posts-section").on("click", (e) => {
         if (!(e.target.href)) return;
         if ((e.target.href).split("/").at(-1) === "#UpdatePostModal") return GetUpdatePost(e);
-        if ((e.target.href).split("/") === "#something") return DeletePost(e);
+        if ((e.target.href).split("/").at(-1) === "#DeletePostModal") return DeletePost(e);
 
     });
-    // $("#UpdatePostModal").on("change", (e) => {
-    //     var postImagesPreviewContainer = document.querySelector("#UpdatePostModal .PreviewImagesContainer")
-    // })
+
 })
 function alertUser(key, message) {
     alertify.set('notifier', 'position', 'top-right');
@@ -224,5 +178,34 @@ function GetUpdatePost(e) {
     })
 }
 function DeletePost(e) {
+    console.log("the delete post function ran")
+
+    $("#DeletePostModal").on("click", (ev) => {
+        console.log("the delete modal has been clicked");
+        if ($(ev.target).attr("id") !== "deletePostBtn") return;
+        ev.preventDefault();
+        var post_slug = $(e.target).attr("data-slug")
+        var url = `/social/post-delete/${post_slug}/`
+        // grab the csrf toke from the form and pass 
+        // it to the data so that the from will post correctly
+        var _form = $("#deletePostForm")
+        $.ajax({
+            url: url,
+            data: _form.serialize(),
+            type: "post",
+            dataType: "json",
+            success: function (data) {
+                if (data.success) {
+                    $(`#DeletePostModal`).modal('hide');
+                    console.log("this post should already deleted")
+                    alertUser("Post", "has been deleted successfully");
+                }
+            },
+            error: function (error) {
+                console.log("error", error)
+            }
+        })
+
+    })
 
 }

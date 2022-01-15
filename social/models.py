@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.template.defaultfilters import slugify
-from django_editorjs import EditorJsField
 
 
 class Tags(models.Model):
@@ -29,15 +28,12 @@ class Post(models.Model):
     def __str__(self):
         return f"{self.author}'s post"
 
-    # def save(self, *args, **kwargs):
-    #     if not self.id:
-    #         self.slug = slugify(self.content)
-    #     return super(Post, self).save(*args, **kwargs)
-
 
 class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    image = models.ForeignKey(
+        Files, on_delete=models.CASCADE, blank=True, null=True)
     content = models.TextField()
     date_commented = models.DateTimeField(default=timezone.now)
 

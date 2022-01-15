@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import edit
 from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
@@ -53,24 +54,13 @@ class PostListView(LoginRequiredMixin, View):
         return render(request, 'social/post-create.html', context)
 
 
-class PostCreateView(View):
-    def get(self, request, post_identity, *args, **kwargs):
-        form = PostForm()
-        posts = Post.objects.all().order_by("-date_posted")
-        context = {"posts": posts, "form": form}
-        return render(request, 'social/post-create.html', context)
-
-    def post(self, request, *args, **kwargs):
-        result = dict()
-        form = PostForm(request.POST or None, request.FILES or None)
-        if form.is_valid():
-            print("form valid")
-            print(request.FILES)
-            result["success"] = True
-            return JsonResponse(result)
-        posts = Post.objects.all().order_by("-date_posted")
-        context = {"posts": posts, "form": form}
-        return render(request, 'social/post-create.html', context)
+class PostDeleteView(View):
+    def post(self, request, post_slug, *args, **kwargs):
+        post = get_object_or_404(Post, post_slug=post_slug)
+        if is_ajax(request=request):
+            print("the request is ajax and the post should be deleted")
+            post.delete()
+            return JsonResponse({"success": True})
 
 
 class UpdatePostView(LoginRequiredMixin, View):
@@ -88,8 +78,12 @@ class UpdatePostView(LoginRequiredMixin, View):
         form = PostForm(request.POST or None,
                         request.FILES or None, instance=post)
         result = {}
+        files = request.FILES.getlist("images")
+        print(files)
         if is_ajax(request=request) and form.is_valid():
+            print(post.images.all().values("image"))
             form.save()
+            # form.save_m2m()
             print("the request is ajax and the form is valid")
             result["success"] = True
             return JsonResponse(result)
@@ -102,6 +96,18 @@ class UpdatePostView(LoginRequiredMixin, View):
             formErrors = render_crispy_form(form, context=csrf_cxt)
             result['formErrors'] = formErrors
             return JsonResponse(result)
+
+
+class DetailPostView(View):
+    def get(self, request, post_slug, *args, **kwargs):
+        post = get_object_or_404(Post, post_slug=post_slug)
+        context = {"post": post, }
+        return render(request, "social/post-detail.html", context)
+
+    def post(self, request, post_slug, *args, **kwargs):
+        pass
+        # the post will be about the comment on this post or images
+        # of the post itself
 
 
 class UserProfileView(View):
