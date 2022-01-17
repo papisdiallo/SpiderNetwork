@@ -175,7 +175,7 @@
         </div>
         <!-- end of update post modal -->
         <!-- delete post modal -->
-        <div class="modal fade" id="DeletePostModal"  tabindex="-1">
+        <div class="modal fade" id="DeletePostModal"  >
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -187,9 +187,10 @@
                 <div class="modal-body pb-5">
                     <div class="container-fluid">
                         
-                        <form method="post" id="deletePostForm">
+                        <form data-slug="{{post.slug}}" method="post" id="deletePostForm">
                             {% csrf_token %}
-                            <h4 style="color: black;"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Your are about to delete this. This action cannot be undone</h4>
+                            <h2 class="delete" style="color: black;"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> You are about to delete this post.<br>
+                                <span class="ml-4"> This action cannot be undone</span></h2>
                             <button type="submit" id="deletePostBtn" class="mt-3 btn btn-danger btn-block">Yes, delete</button>
                         </form>
                     </div>
@@ -198,6 +199,31 @@
             </div>
         </div>
          <!-- end of delete post modal -->
+         <!-- delete comment post modal -->
+         <div class="modal fade" id="DeleteCommentPostModal" tabindex="-1" >
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete this Comment</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            &times;
+                        </button> 
+                </div>       
+                <div class="modal-body pb-5">
+                    <div class="container-fluid">
+                        
+                        <form data-slug="comment_{{comment.id}}" method="post" id="deleteCommentPostForm">
+                            {% csrf_token %}
+                            <h2 class="delete" style="color: black;"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> You are about to delete this comment.<br>
+                                <span class="ml-4"> This action cannot be undone</span></h2>
+                            <button type="submit" id="deleteCommentPostBtn" class="mt-3 btn btn-danger btn-block">Yes, delete</button>
+                        </form>
+                    </div>
+                </div>         
+            </div>
+            </div>
+        </div>
+         <!-- end of delete comment post modal -->
     <div class="main-ws-sec">
         <div class="post-topbar">
             <div class="user-picy">
@@ -213,69 +239,71 @@
         <div class="posts-section">
             {% for post in posts %} 
                 <div class="post-bar">
-                <div class="post_topbar">
+                    <div class="post_topbar">
 
-                <div class="usy-dt">
-                <img src="{{post.author.profile.avatar.url}}" alt="post author">
-                <div class="usy-name">
-                <h3>{{post.author.username}}</h3>
-                <span><i class="fa fa-clock-o" aria-hidden="true"></i>{{post.date_posted|timesince|first_value}} ago</span>
-                </div>
-                </div>
-                <div class="ed-opts">
-                <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
-                <ul class="ed-options">
-                <li><a data-bs-toggle="modal" id="{{post.post_slug}}" href="#UpdatePostModal" role="button"><i class="fas fa-edit mr-2"></i> Edit Post</a></li>
-                <li><a href="#"  title=""><i class="fa fa-eye-slash mr-2"></i>Hide</a></li>
-                <li><a href="#DeletePostModal" data-bs-toggle="modal" data-slug="{{post.post_slug}}" title=""> <i class="fas fa-trash-alt mr-2"></i>Delete </a></li>
-                </ul>
-                </div>
-                </div>
-                <div class="epi-sec">
-                <ul class="descp">
-                <li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
-                <li><img src="images/icon9.png" alt=""><span>India</span></li>
-                </ul>
-                <ul class="bk-links">
-                <li><a href="#" title=""><i class="fa fa-share" aria-hidden="true"></i></a></li>
-                <li class="follow"><span>Follow</span></li>
-                </ul>
-                </div>
-                <div class="job_descp">  
-                    <p> {{post.content}}<a href="#" title="">view more</a></p>
-                    {% for image in post.images.all %}
-                        {% if forloop.first %}
-                            <div class="PreviewImagesContainer">
-                            <div class="post-images reverse">
-                        {% endif %}
-                        
-                        {% if forloop.counter|create_second_div_once %}
-                                <div class="second_child_row">
-                                    {% for image in post.images.all %}
-                                        {% if not forloop.counter|divisibleby:3 and not forloop.counter|divisibleby:5 %}
-                                            <div class="post-images__child">
-                                                <img src="{{image.image.url}}" alt="post-image" />
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                        {% endif %}
+                        <div class="usy-dt">
+                            <img src="{{post.author.profile.avatar.url}}" alt="post author">
+                            <div class="usy-name">
+                                <h3>{{post.author.username}}</h3>
+                                <span><i class="fa fa-clock-o" aria-hidden="true"></i>{{post.date_posted|age}} ago</span>
+                            </div>
+                        </div>
+                        <div class="ed-opts">
+                            <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
+                            <ul class="ed-options">
+                                <li><a data-bs-toggle="modal" id="{{post.post_slug}}" href="#UpdatePostModal" role="button"><i class="fas fa-edit mr-2"></i> Edit Post</a></li>
+                                <li><a href="#"  title=""><i class="fa fa-eye-slash mr-2"></i>Hide</a></li>
+                                <li><a href="#DeletePostModal" data-bs-toggle="modal" data-slug="{{post.post_slug}}" title=""> <i class="fas fa-trash-alt mr-2"></i>Delete </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="epi-sec">
+                        <ul class="descp">
+                            <li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
+                            <li><img src="images/icon9.png" alt=""><span>India</span></li>
+                        </ul>
+                        <ul class="bk-links">
+                            <li><a href="#" title=""><i class="fa fa-share" aria-hidden="true"></i></a></li>
+                            <li class="follow"><span>Follow</span></li>
+                        </ul>
+                    </div>
+                    <div class="job_descp">  
+                        <p> {{post.content}}<a href="#" title="">view more</a></p>
+                        {% for image in post.images.all %}
+                            {% if forloop.first %}
+                                <div class="PreviewImagesContainer">
+                                <div class="post-images reverse">
+                            {% endif %}
+                            
+                            {% if forloop.counter|create_second_div_once %}
+                                    <div class="second_child_row">
+                                        {% for image in post.images.all %}
+                                            {% if not forloop.counter|divisibleby:3 and not forloop.counter|divisibleby:5 %}
+                                                <div class="post-images__child">
+                                                    <img src="{{image.image.url}}" alt="post-image" />
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                            {% endif %}
 
-                        {% if forloop.counter|create_first_div_once %}
-                                <div class="second_child_row">
-                                    {% for image in post.images.all %}
-                                        {% if forloop.counter|divisibleby:3 or forloop.counter|divisibleby:5 %}
-                                            <div class="post-images__child">
-                                                <img src="{{image.image.url}}" alt="post-image" />
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                        {% endif %}
+                            {% if forloop.counter|create_first_div_once %}
+                                    <div class="second_child_row">
+                                        {% for image in post.images.all %}
+                                            {% if forloop.counter|divisibleby:3 or forloop.counter|divisibleby:5 %}
+                                                <div class="post-images__child">
+                                                    <img src="{{image.image.url}}" alt="post-image" />
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                            {% endif %}
 
-                        {% if forloop.last %}</div></div>{% endif %}
-                    {% endfor %}
-                </div>
+                            {% if forloop.last %}
+                                </div></div>
+                            {% endif %}
+                        {% endfor %}
+
                 <div class="job-status-bar">
                 <ul class="like-com">
                 <li>
@@ -287,8 +315,50 @@
                 </ul>
                 <a href="#"><i class="fas fa-eye"></i>Views 50</a>
                 </div>
+                <div class="post-comment mt-4">
+                    {% for comment in post.comments.all|two_last_comments %}
+                        {% if forloop.first %} <div class="comment-section">
+                            <div class="comment-sec">{% endif %}
+                                <ul>
+                                    <li>
+                                        <div class="comment-list">
+                                            <div class="bg-img">
+                                                <img src="{{post.author.profile.avatar.url}}" style="width: 40px;" alt="">
+                                            </div>
+                                            <div class="comment"> 
+                                                <h3>{{post.author.username}}</h3>
+                                                <div> 
+                                                    <p>{{comment.content}}</p>
+                                                </div>
+                                                <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
+                                                <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> {{comment.date_commented|timesince}}</span>
+                                                <span id="comment_like_{{comment.id}}" class="com-action"><i class="fa fa-thumbs-up"></i></span>
+                                                <span id="comment_delete_{{comment.id}}" class="com-action">
+                                                    <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
+                                                </span>
+                                            </div>
+                                        </div>           
+                                    </li>
+                                </ul>
+
+                        {% if forloop.last %}</div></div>{% endif %}
+                    {% endfor %}
+                    <div class="cm_img">
+                        <img src="/static/landing/images/bg-img4.png" alt="">
+                    </div>
+                    <div class="comment_box">             
+                        <form method="post" data-slug="{{post.post_slug}}">
+                            {% csrf_token %}
+                            <textarea name="content" placeholder="Comment on this post here..." cols="40" rows="2" required="" id="id_content"></textarea>
+                            <button id="" name="commentpost" >Send</button>
+                        </form>
+                    </div>
                 </div>
+            </div>
+
+            </div>
             {% endfor %}
+
         <div class="top-profiles">
         <div class="pf-hd">
         <h3>Top Profiles</h3>

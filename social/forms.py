@@ -44,3 +44,12 @@ class PostForm(forms.ModelForm):
             Field("images"),
             # Submit("post-create", "Post")
         )
+
+
+class CommentPostForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ("content",)
+        widgets = {
+            "content": forms.Textarea(attrs={"placeholder": "Comment on this post here....", "label": ""})
+        }

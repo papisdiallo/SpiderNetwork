@@ -72,7 +72,6 @@ $(document).ready(function () {
     modalsId.forEach((_id, index) => {
         $(`${_id}`).on("change", (e) => {
             if ($(e.target).attr("id") !== "id_images") return;
-            console.log("just passed the test fo the id")
             var postImagesPreviewContainer = document.querySelector(`${_id} .PreviewImagesContainer`);
             $(`${_id} .maxFileError`).fadeOut()
             $(postImagesPreviewContainer).html("");
@@ -127,11 +126,17 @@ $(document).ready(function () {
 
 
     $(".posts-section").on("click", (e) => {
-        if (!(e.target.href)) return;
-        if ((e.target.href).split("/").at(-1) === "#UpdatePostModal") return GetUpdatePost(e);
-        if ((e.target.href).split("/").at(-1) === "#DeletePostModal") return DeletePost(e);
+        if (!(e.target.href) && !(e.target.name)) return;
+        if (e.target.href) {
+            if ((e.target.href).split("/").at(-1) === "#UpdatePostModal") return GetUpdatePost(e);
+            if ((e.target.href).split("/").at(-1) === "#DeletePostModal") return DeletePost(e);
+            if ((e.target.href).split("/").at(-1) === "#DeleteCommentPostModal") return DeleteCommentPost(e);
+        } else {
+            if (e.target.getAttribute("name") === "commentpost") return commentOnPost(e);
 
+        }
     });
+
 
 })
 function alertUser(key, message) {
@@ -178,16 +183,12 @@ function GetUpdatePost(e) {
     })
 }
 function DeletePost(e) {
-    console.log("the delete post function ran")
 
     $("#DeletePostModal").on("click", (ev) => {
-        console.log("the delete modal has been clicked");
         if ($(ev.target).attr("id") !== "deletePostBtn") return;
         ev.preventDefault();
         var post_slug = $(e.target).attr("data-slug")
         var url = `/social/post-delete/${post_slug}/`
-        // grab the csrf toke from the form and pass 
-        // it to the data so that the from will post correctly
         var _form = $("#deletePostForm")
         $.ajax({
             url: url,
@@ -208,4 +209,88 @@ function DeletePost(e) {
 
     })
 
+}
+function commentOnPost(e) {
+    e.preventDefault();
+    e.target.setAttribute("disabled", true);
+    var _form = $(e.target).parent();
+    var post_slug = _form.attr("data-slug");
+    $.ajax({
+        url: `/social/comment-on-post/${post_slug}/`,
+        data: _form.serialize(),
+        method: "post",
+        success: function (data) {
+            if (data.success) {
+                var comment = JSON.parse(data.comment_obj)
+                console.log(comment[0]["fields"]);
+                var commentUl = `
+                <ul>
+                    <li>
+                        <div class="comment-list">
+                            <div class="bg-img">
+                                <img src="${data.imageUrl}" style="width: 40px;" alt="">
+                            </div>
+                            <div class="comment"> 
+                                <h3>${comment[0].fields["author"][0]}</h3>
+                                <div> 
+                                    <p>${comment[0].fields["content"]}</p>
+                                </div>
+                                <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
+                                <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> ${comment[0].fields["date_commented"]}</span>
+                                <span id="comment_like_${comment[0].pk}"class="com-action"><i class="fa fa-thumbs-up"></i></span>
+                                <span id="comment_delete_${comment[0].pk}"class="com-action"><i class="fa fa-trash mx-1"></i></span>
+                            </div>
+                        </div>           
+                    </li>
+                </ul>
+            `
+                if (_form.parent().next().length === 0) {
+                    var comment_section = document.createElement("div");
+                    $(comment_section).attr("class", "comment-section");
+                    var comment_sec = document.createElement("div");
+                    $(comment_sec).attr("class", "comment-sec");
+                    comment_section.appendChild(comment_sec);
+                    $(comment_sec).append(commentUl)
+                    _form.parent().parent().prepend(comment_section);
+                } else {
+                    _form.parent().find(".comment-sec").append(commentUl)
+                }
+                $(e.target).prop("disabled", false);
+                _form[0].reset();
+
+            }
+            console.log(data.success)
+        },
+        error: function (error) {
+            console.log("there was an error when commenting on post", error)
+        }
+    })
+
+}
+function DeleteCommentPost(e) {
+    console.log("the delete comment post ran")
+    var data_slug = $(e.target).attr("data-slug").split("_").at(-1);
+    var url = `/social/delete-comment-post/${data_slug}/`
+
+    $("#DeleteCommentPostModal").on("click", (ev) => {
+        if ($(ev.target).attr("id") !== "deleteCommentPostBtn") return;
+        ev.preventDefault();
+        var _form = $("#deleteCommentPostForm")
+        $.ajax({
+            url: url,
+            data: _form.serialize(),
+            type: "post",
+            dataType: "json",
+            success: function (data) {
+                if (data.success) {
+                    $(`#DeleteCommentPostModal`).modal('hide');
+                    console.log("this comment should already deleted")
+                    alertUser("Comment", "has been deleted successfully");
+                }
+            },
+            error: function (error) {
+                console.log("error", error)
+            }
+        })
+    });
 }

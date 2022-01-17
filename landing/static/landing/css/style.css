@@ -481,9 +481,6 @@ hr {
 }
 
 /* ================ CROSS BROWSER COMPATABILITY =============== */
-img{
-	max-width: 100%;
-}
 .ask-question,
 nav,
 .notification-box.active,
@@ -1428,7 +1425,7 @@ main {
 	-o-border-radius: 100px;
 	border-radius: 100px;
 	margin-top: 2px;
-	width: 60px;
+	width: 50px;
 }
 .ed-opts {
 	float: right;
@@ -1473,6 +1470,11 @@ main {
 .ed-options li:last-child {
 	margin-bottom: 0;
 }
+h2.delete {
+	font-size: 1.2rem !important;
+    font-weight: 500 !important;
+    color: #6a2c2c !important;
+}
 .ed-options li a {
 	color: #686868;
 	font-size: 14px;
@@ -1513,7 +1515,6 @@ input#submit-id-editproject {
     width: 100%;
 	height: 100%;
 	border: 1px solid #a6a6a7;
-    border-radius: 5px;
 
 }
 .ed-opts > a:hover {
@@ -1976,12 +1977,28 @@ input#submit-id-editproject {
 
 
 /* =============== comment-section ============== */
+.com-action {
+	display:inline; 
+	float: right; 
+	margin-right: 10px;
+	cursor: pointer;
+	transition: all ease .3s;
+	color: #b2b2b2;
+    font-size: 14px;
+    font-weight: 600;
+}
+.com-action a i{
+	pointer-events: none !important;
+}
+.com-action:hover{
+	color:#34011aed;
+}
 
 .comment-section {
 	float: left;
 	width: 100%;
 	background-color: #fff;
-	padding: 20px;
+	padding: 15px 20px 0 0;
 	box-shadow: 0px 3px #e4e4e4;
 }
 .plus-ic {
@@ -2046,12 +2063,13 @@ input#submit-id-editproject {
 	color: #000000;
 	font-size: 16px;
 	font-weight: 600;
-	margin-bottom: 10px;
+	margin-bottom: 5px;
 }
 .comment img {
 	position: relative;
 	top: 2px;
 	margin-right: 5px;
+	width: 40px !important;
 }
 .comment span {
 	color: #b2b2b2;
@@ -2059,11 +2077,17 @@ input#submit-id-editproject {
 	display: block;
 	margin-bottom: 14px;
 }
+.comment div {
+	margin-bottom: 5px;
+}
 .comment p {
 	color: #686868;
-	font-size: 14px;
-	margin-bottom: 10px;
-	line-height: 20px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    line-height: 20px;
+    padding: 10px;
+    background: whitesmoke;
+    border: 1px solid #ededed;
 }
 .comment > a {
 	display: inline-block;
@@ -2094,17 +2118,15 @@ input#submit-id-editproject {
 .comment_box {
 	float: none;
 }
-.comment_box input {
+.comment_box textarea {
 	width: 372px;
-	height: 40px;
 	border: 1px solid #e5e5e5;
 	background-color: #efefef;
 	padding-left: 10px;
 	color: #b2b2b2;
 	font-size: 14px;
 	font-weight: 600;
-	line-height: 40px;
-	resize: none;
+	line-height: 20px;
 }
 .comment_box form button {
 	float: right;
@@ -2115,7 +2137,7 @@ input#submit-id-editproject {
 	text-align: center;
 	font-size: 14px;
 	border: 0;
-	margin-left: 10px;
+	margin-left: 5px;
 	cursor: pointer;
 	font-weight: 600;
 }

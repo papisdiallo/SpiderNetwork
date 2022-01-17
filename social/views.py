@@ -3,14 +3,16 @@ from django.views.generic import edit
 from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
-from .models import Post, Files, UserProfile
+from .models import Post, Files, UserProfile, Comment
 from django.template.loader import render_to_string
-from .forms import PostForm
+from .forms import PostForm, CommentPostForm
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.decorators.csrf import requires_csrf_token
 from django.core.files.storage import FileSystemStorage
+from django.core import serializers
+import json
 
 
 def is_ajax(request):
@@ -20,8 +22,9 @@ def is_ajax(request):
 class PostListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = PostForm()
+        commentForm = CommentPostForm()
         posts = Post.objects.all().order_by("-date_posted")
-        context = {"posts": posts, "form": form}
+        context = {"posts": posts, "form": form, "commentForm": commentForm}
         return render(request, 'social/post-list.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -126,3 +129,39 @@ class UserProfileView(View):
 
 def JobsView(request):
     return render(request, 'landing/jobs.html')
+
+
+class CreateCommentPostView(View):
+    def post(self, request, post_slug, *args, **kwargs):
+        post = get_object_or_404(Post, post_slug=post_slug)
+        form = CommentPostForm(request.POST or None)
+        if is_ajax(request=request) and form.is_valid():
+            print("the form is valid and the request is ajax")
+            comment_post = form.save(commit=False)
+            print(form.cleaned_data.get("content"))
+            comment_post.author = request.user
+            comment_post.post = post
+            # comment_post.save()
+            jsonInstance = serializers.serialize(
+                "json",
+                [
+                    comment_post,
+                ],
+                use_natural_foreign_keys=True,  # I don't use one for now
+            )
+            result = {}
+            result["success"] = True
+            result["comment_obj"] = jsonInstance
+            result["imageUrl"] = comment_post.author.profile.avatar.url
+            return JsonResponse(result)
+        result = {"success": False}
+        return JsonResponse(result)
+
+
+class DeleteCommentPostView(View):
+    def post(self, request, comment_id, *args, **kwargs):
+        if is_ajax(request=request):
+            print("the request is ajax and this post should be deleted")
+            comment = get_object_or_404(Comment, id=comment_id)
+            comment.delete()
+        return JsonResponse({"success": True})

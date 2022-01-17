@@ -12,4 +12,8 @@ urlpatterns = [
     path('post-detail/<slug:post_slug>/',
          s_views.DetailPostView.as_view(), name="detail-post-view"),
     path('jobs-list/', s_views.JobsView, name="jobs-list-view"),
+    path('comment-on-post/<slug:post_slug>/',
+         s_views.CreateCommentPostView.as_view(), name="create-postcomment-view"),
+    path('delete-comment-post/<int:comment_id>/',
+         s_views.DeleteCommentPostView.as_view(), name="delete-postcomment-view"),
 ]
