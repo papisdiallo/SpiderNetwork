@@ -141,7 +141,7 @@ class CreateCommentPostView(View):
             print(form.cleaned_data.get("content"))
             comment_post.author = request.user
             comment_post.post = post
-            # comment_post.save()
+            comment_post.save()
             jsonInstance = serializers.serialize(
                 "json",
                 [
@@ -153,6 +153,7 @@ class CreateCommentPostView(View):
             result["success"] = True
             result["comment_obj"] = jsonInstance
             result["imageUrl"] = comment_post.author.profile.avatar.url
+            result["comment_pk"] = comment_post.pk
             return JsonResponse(result)
         result = {"success": False}
         return JsonResponse(result)
@@ -163,5 +164,21 @@ class DeleteCommentPostView(View):
         if is_ajax(request=request):
             print("the request is ajax and this post should be deleted")
             comment = get_object_or_404(Comment, id=comment_id)
+            post_slug = comment.post.post_slug
             comment.delete()
-        return JsonResponse({"success": True})
+        return JsonResponse({"success": True, "post_slug": post_slug, })
+
+
+class AddRemovePostLikes(View):
+    def get(self, request, post_slug, *args, **kwargs):
+        if is_ajax(request=request):
+            post = get_object_or_404(Post, post_slug=post_slug)
+            is_liked = post.likes.filter(
+                username=request.user.username).exists()
+            if not is_liked:
+                post.likes.add(request.user)
+                post.save()
+            else:
+                post.likes.remove(request.user)
+                post.save()
+            return JsonResponse({"is_liked": is_liked})

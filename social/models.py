@@ -23,6 +23,7 @@ class Post(models.Model):
     content = models.TextField()
     post_slug = models.SlugField(blank=True, null=True)
     date_updated = models.DateTimeField(auto_now=True)
+    likes = models.ManyToManyField(User,  related_name="likes", blank=True,)
     date_posted = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -55,5 +56,5 @@ class UserProfile(models.Model):
     date_created = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
 
-    # def __str__(self):
-    #     return f"{user.username}'s profile"
+    def __str__(self):
+        return f"{user.username}'s profile"

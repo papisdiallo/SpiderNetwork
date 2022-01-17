@@ -126,12 +126,14 @@ $(document).ready(function () {
 
 
     $(".posts-section").on("click", (e) => {
+
         if (!(e.target.href) && !(e.target.name)) return;
         if (e.target.href) {
             if ((e.target.href).split("/").at(-1) === "#UpdatePostModal") return GetUpdatePost(e);
             if ((e.target.href).split("/").at(-1) === "#DeletePostModal") return DeletePost(e);
             if ((e.target.href).split("/").at(-1) === "#DeleteCommentPostModal") return DeleteCommentPost(e);
         } else {
+            if (e.target.getAttribute("name") === "PostLike") return PostLike(e);
             if (e.target.getAttribute("name") === "commentpost") return commentOnPost(e);
 
         }
@@ -211,6 +213,7 @@ function DeletePost(e) {
 
 }
 function commentOnPost(e) {
+    console.log("the comment on post run")
     e.preventDefault();
     e.target.setAttribute("disabled", true);
     var _form = $(e.target).parent();
@@ -222,7 +225,6 @@ function commentOnPost(e) {
         success: function (data) {
             if (data.success) {
                 var comment = JSON.parse(data.comment_obj)
-                console.log(comment[0]["fields"]);
                 var commentUl = `
                 <ul>
                     <li>
@@ -237,13 +239,15 @@ function commentOnPost(e) {
                                 </div>
                                 <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
                                 <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> ${comment[0].fields["date_commented"]}</span>
-                                <span id="comment_like_${comment[0].pk}"class="com-action"><i class="fa fa-thumbs-up"></i></span>
-                                <span id="comment_delete_${comment[0].pk}"class="com-action"><i class="fa fa-trash mx-1"></i></span>
-                            </div>
-                        </div>           
-                    </li>
-                </ul>
-            `
+                                <span id="comment_like_${data.comment_pk}" class="com-action"><i class="far fa-thumbs-up"></i></span>
+                                <span id="comment_delete_${data.comment_pk}" class="com-action">
+                                    <a data-bs-toggle="modal" data-slug="comment_${data.comment_pk}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
+                                </span>
+                            </div >
+                        </div >           
+                    </li >
+                </ul >
+                    `
                 if (_form.parent().next().length === 0) {
                     var comment_section = document.createElement("div");
                     $(comment_section).attr("class", "comment-section");
@@ -257,9 +261,11 @@ function commentOnPost(e) {
                 }
                 $(e.target).prop("disabled", false);
                 _form[0].reset();
+                var comments_count = $(`.${post_slug}_comments_count`).text()
+                $(`.${post_slug}_comments_count`).text(parseInt(comments_count) + 1)
+
 
             }
-            console.log(data.success)
         },
         error: function (error) {
             console.log("there was an error when commenting on post", error)
@@ -284,7 +290,9 @@ function DeleteCommentPost(e) {
             success: function (data) {
                 if (data.success) {
                     $(`#DeleteCommentPostModal`).modal('hide');
-                    console.log("this comment should already deleted")
+                    var comments_count = $(`.${data.post_slug}_comments_count`).text()
+                    console.log(comments_count)
+                    $(`.${data.post_slug}_comments_count`).text(parseInt(comments_count) - 1)
                     alertUser("Comment", "has been deleted successfully");
                 }
             },
@@ -293,4 +301,33 @@ function DeleteCommentPost(e) {
             }
         })
     });
+}
+function PostLike(e) {
+    var post_slug = $(e.target).attr("data-slug")
+    var url = `/social/like-post/${post_slug}/`
+    $.ajax({
+        url: url,
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            console.log(data.is_liked)
+            var _icon = e.target.firstElementChild
+            var likes_count = $(e.target).find(".likes-count").text()
+            console.log(likes_count)
+            if (data.is_liked) {
+                $(e.target).find(".likes-count").text(parseInt(likes_count) - 1)
+                $(_icon).removeClass("is-liked").removeClass("fa").addClass("far")
+            } else {
+                $(e.target).find(".likes-count").text(parseInt(likes_count) + 1)
+                $(_icon).removeClass("far").addClass("is-liked").addClass("fa")
+            }
+        },
+        error: function () {
+
+        }
+    })
+
+}
+function CommentLike(e) {
+
 }

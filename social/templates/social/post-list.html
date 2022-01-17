@@ -304,16 +304,15 @@
                             {% endif %}
                         {% endfor %}
 
-                <div class="job-status-bar">
-                <ul class="like-com">
-                <li>
-                <a href="#"><i class="fas fa-heart"></i> Like</a>
-                <img src="images/liked-img.png" alt="">
-                <span>25</span>
-                </li>
-                <li><a href="#" class="com"><i class="fas fa-comment-alt"></i> Comment 15</a></li>
-                </ul>
-                <a href="#"><i class="fas fa-eye"></i>Views 50</a>
+                <div class="job-status-bar d-flex align-items-center justify-content-around py-1">                    
+                    <button class="com" name="PostLike" data-slug="{{post.post_slug}}">
+                        <i class=" {% if request.user in post.likes.all %} is-liked fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
+                         Like <span class="likes-count">{{post.likes.all.count}}</span>
+                    </button>
+                    <button class="com" name="PostComments">
+                        <i class="far fa-comment-alt"></i> Comment <span class="{{post.post_slug}}_comments_count">{{post.comments.all.count}}</span>
+                    </button>
+                    <div class="post-views" style="cursor:default;"><i class="far fa-eye mr-1"></i>Views 50</div>
                 </div>
                 <div class="post-comment mt-4">
                     {% for comment in post.comments.all|two_last_comments %}
@@ -332,7 +331,7 @@
                                                 </div>
                                                 <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
                                                 <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> {{comment.date_commented|timesince}}</span>
-                                                <span id="comment_like_{{comment.id}}" class="com-action"><i class="fa fa-thumbs-up"></i></span>
+                                                <span id="comment_like_{{comment.id}}" class="com-action"><i class="far fa-thumbs-up"></i></span>
                                                 <span id="comment_delete_{{comment.id}}" class="com-action">
                                                     <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
                                                 </span>

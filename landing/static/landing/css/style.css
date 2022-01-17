@@ -1726,7 +1726,7 @@ input#submit-id-editproject {
 	font-size: 14px;
 	font-weight: 500;
 	float: left;
-	margin-top: 6px;
+	margin-top: 7px;
 	margin-right: 5px;
 }
 .like-com li a:hover {
@@ -1756,7 +1756,7 @@ input#submit-id-editproject {
 	float: left;
 	text-align: center;
 	font-weight: 600;
-	margin-left: -25px;
+	margin-left: 0px;
 }
 .like-com li .com {
 	position: relative;
@@ -4798,8 +4798,7 @@ a:hover {
 
 /* ============= account-tabs-setting ============ */
 
-.profile-account-setting {
-}
+
 .account-tabs-setting {
 	float: left;
 	width: 100%;
@@ -6173,7 +6172,7 @@ a:hover {
 	border-radius: 3px;
 	color: #34011aed;
 	cursor: pointer;
-	display: inline-block;
+	/* display: inline-block; */
 	font-size:15px;
 	font-weight: 600;
 	outline: none;
@@ -6476,9 +6475,7 @@ a:hover {
     float: right;
     vertical-align: .255em;
 }
-.checkbox{
-	
-}
+
 .form-check {   
     padding-left: 0;
 }
@@ -6608,12 +6605,11 @@ a:hover {
     margin-right: 5px;
 }
 .job-status-bar {
-	border-top:1px solid #e5e5e5;
+	border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+    margin-top: 15px;
 }
 
-.main-ws-sec .job-status-bar {
-	
-}
 .main-ws-sec .btm-line {
     padding-bottom: 20px !important;
     border-bottom: 1px solid #e5e5e5 !important;
@@ -7151,6 +7147,26 @@ li.follow {
     border-radius: 4px;
     background-position: 5px 12px;
     overflow-wrap: break-word;
+}
+button.com, .post-views {
+    background: none; 
+    border: none;   
+    outline: none;
+    padding:  10px 20px;
+    text-align: center;
+    font-weight: 500;
+    color: #b2b2b2;
+    margin-right: 15px;
+    cursor: pointer;
+    letter-spacing: 0.03rem;
+}
+i.is-liked.fa.fa-thumbs-up {
+    color: #42132a;
+}
+button.com:hover {
+    background: whitesmoke;
+    color: #686868;
+    border-radius: 5px;
 }
 .custom-file-input::-webkit-file-upload-button {
   visibility: hidden;
