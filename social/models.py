@@ -37,6 +37,9 @@ class Comment(models.Model):
     image = models.ForeignKey(
         Files, on_delete=models.CASCADE, blank=True, null=True)
     content = models.TextField()
+    comment_slug = models.SlugField(blank=True, null=True)
+    likes = models.ManyToManyField(
+        User,  related_name="comment_likes", blank=True,)
     date_commented = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -57,4 +60,4 @@ class UserProfile(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{user.username}'s profile"
+        return f"{self.user.username}'s profile"

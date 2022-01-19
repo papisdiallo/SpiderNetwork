@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     let imageFiles = []
     const modalsId = ["#CreatePostModal", "#UpdatePostModal"]
 
@@ -126,7 +127,6 @@ $(document).ready(function () {
 
 
     $(".posts-section").on("click", (e) => {
-
         if (!(e.target.href) && !(e.target.name)) return;
         if (e.target.href) {
             if ((e.target.href).split("/").at(-1) === "#UpdatePostModal") return GetUpdatePost(e);
@@ -138,6 +138,13 @@ $(document).ready(function () {
 
         }
     });
+    $("#prof-sections").on("click", (e) => {
+
+        var _form = $("#UserProfileForm")
+        if ((e.target.href) && (e.target.name)) {
+            $("#UserProfileModal .modal-body .container-fluid").html(_form)
+        } else { return; }
+    })
 
 
 })
@@ -213,7 +220,6 @@ function DeletePost(e) {
 
 }
 function commentOnPost(e) {
-    console.log("the comment on post run")
     e.preventDefault();
     e.target.setAttribute("disabled", true);
     var _form = $(e.target).parent();
@@ -247,17 +253,19 @@ function commentOnPost(e) {
                         </div >           
                     </li >
                 </ul >
-                    `
-                if (_form.parent().next().length === 0) {
+                `
+                var commentsContainer = $(`.post-comment-${post_slug}`)
+                console.log(commentsContainer.children().length)
+                if (commentsContainer.children().length === 1) {
                     var comment_section = document.createElement("div");
                     $(comment_section).attr("class", "comment-section");
                     var comment_sec = document.createElement("div");
                     $(comment_sec).attr("class", "comment-sec");
                     comment_section.appendChild(comment_sec);
                     $(comment_sec).append(commentUl)
-                    _form.parent().parent().prepend(comment_section);
+                    $(commentsContainer).prepend(comment_section);
                 } else {
-                    _form.parent().find(".comment-sec").append(commentUl)
+                    $(commentsContainer).find(".comment-sec").append(commentUl)
                 }
                 $(e.target).prop("disabled", false);
                 _form[0].reset();
@@ -267,6 +275,7 @@ function commentOnPost(e) {
 
             }
         },
+
         error: function (error) {
             console.log("there was an error when commenting on post", error)
         }
@@ -302,19 +311,49 @@ function DeleteCommentPost(e) {
         })
     });
 }
+
+// setting the csrf token config I guess...
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
 function PostLike(e) {
-    var post_slug = $(e.target).attr("data-slug")
-    var url = `/social/like-post/${post_slug}/`
+    console.log("the post like function ran");
+    var post_slug = $(e.target).attr("data-slug").split("_")
+    var slug = post_slug.at(-1)
+    var liked_a = post_slug[0]
+    console.log(liked_a)
+    console.log(slug);
+    var url = `/social/like-post/${slug}/`
+    data = { "liked_a": liked_a }
     $.ajax({
         url: url,
-        type: "get",
+        type: "post",
+        data: data,
         dataType: "json",
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin',// Do not send CSRF token to another domain.
         success: function (data) {
             console.log(data.is_liked)
             var _icon = e.target.firstElementChild
             var likes_count = $(e.target).find(".likes-count").text()
-            console.log(likes_count)
-            if (data.is_liked) {
+            if (data.is_liked === "Not accepted") {
+                alert("Sorry! You cannot like your own post!")
+            }
+            else if (data.is_liked) {
                 $(e.target).find(".likes-count").text(parseInt(likes_count) - 1)
                 $(_icon).removeClass("is-liked").removeClass("fa").addClass("far")
             } else {

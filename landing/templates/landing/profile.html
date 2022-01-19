@@ -1,509 +1,552 @@
-{% extends 'landing/partials/base.html' %}
+{% extends 'landing/partials/base.html' %} 
+{% load crispy_forms_tags %} 
+{% load static %}
 {% load crispy_forms_tags %}
 {% load static %}
-{% block header %} {% include 'landing/partials/header.html' %}{% endblock header %} 
+{% load createDivOnlyOnce %}
+{% block header %} {% include 'landing/partials/header.html' %}{% endblock header %}
 <div class="wrapper">
-{% block sectionCover %}
-    <section class="cover-sec">
-        <img src="{% static 'landing/images/cover-img.jpg' %}" alt="">
-    </section>
-{% endblock sectionCover %}
-{% block rightContent %}
-    <div class="main-left-sidebar">
+  {% block sectionCover %}
+  <section class="cover-sec">
+    <img src="{% static 'landing/images/spider-cover.jpg' %}" alt="" />
+  </section>
+  {% endblock sectionCover %}
+   {% block rightContent %}
+  <div class="main-left-sidebar">
     <div class="user_profile">
-    <div class="user-pro-img">
-    <img src="{{profile.avatar.url}}" alt="">
-    </div>
-    <div class="user_pro_status">
-    <ul class="flw-hr">
-    <li><a href="#" title="" class="flww"><i class="fa fa-plus"></i> Follow</a></li>
-    </ul>
-    <ul class="flw-status">
-    <li>
-    <span>Following</span>
-    <b>34</b>
-    </li>
-    <li>
-    <span>Followers</span>
-    <b>155</b>
-    </li>
-    </ul>
-    </div>
-    <ul class="social_links">
-    <li><a href="#" title=""><i class="fa fa-globe"></i> www.example.com</a></li>
-    <li><a href="#" title=""><i class="fa fa-facebook-square"></i> Http://www.facebook.com/john...</a></li>
-    <li><a href="#" title=""><i class="fa fa-twitter"></i> Http://www.Twitter.com/john...</a></li>
-    <li><a href="#" title=""><i class="fa fa-google-plus-square"></i> Http://www.googleplus.com/john...</a></li>
-    <li><a href="#" title=""><i class="fa fa-behance-square"></i> Http://www.behance.com/john...</a></li>
-    <li><a href="#" title=""><i class="fa fa-pinterest"></i> Http://www.pinterest.com/john...</a></li>
-    <li><a href="#" title=""><i class="fa fa-instagram"></i> Http://www.instagram.com/john...</a></li>
-    <li><a href="#" title=""><i class="fa fa-youtube"></i> Http://www.youtube.com/john...</a></li>
-    </ul>
+      <div class="user-pro-img position-relative">
+        <img src="{{profile.avatar.url}}" alt="" />
+        <span class="profile-image-camera"><i class="fa fa-camera-retro" aria-hidden="true"></i></span>
+      </div>
+      <div class="user_pro_status">
+        <ul class="flw-hr">
+          <li>
+            <a href="#" title="" class="flww"
+              ><i class="fa fa-plus"></i> Follow</a
+            >
+          </li>
+        </ul>
+        <ul class="flw-status">
+          <li>
+            <span>Following</span>
+            <b>34</b>
+          </li>
+          <li>
+            <span>Followers</span>
+            <b>155</b>
+          </li>
+        </ul>
+      </div>
+      <ul class="social_links" id="prof-sections">
+        <li>
+          <a data-bs-toggle="modal" href="#UserProfileModal" name="bio" title=""><i class="fa fa-address-book"></i>Add Bio</a>
+        </li>
+        <li>
+          <a data-bs-toggle="modal" href="#UserProfileModal" name="full_name" title="">
+            <i class="fa fa-user"></i>
+            Add Your full name</a
+          >
+        </li>
+        <li>
+          <a data-bs-toggle="modal" href="#UserProfileModal" name="location" title=""
+            ><i class="fa fa-map-marker-alt"></i>Add Your Location</a
+          >
+        </li>
+        <li>
+          <a data-bs-toggle="modal" href="#UserProfileModal" name="birth_date" title="">
+            <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+            Add Birth date</a
+          >
+        </li>
+
+      </ul>
     </div>
     <div class="suggestions full-width">
-    <div class="sd-title">
-    <h3>Suggestions</h3>
-    <i class="fa fa-ellipsis-v"></i>
+      <div class="sd-title">
+        <h3>Suggestions</h3>
+        <i class="fa fa-ellipsis-v"></i>
+      </div>
+      <div class="suggestions-list">
+        <div class="suggestion-usd">
+          <img src="images/resources/s1.png" alt="" />
+          <div class="sgt-text">
+            <h4>Jessica William</h4>
+            <span>Graphic Designer</span>
+          </div>
+          <span><i class="fa fa-plus"></i></span>
+        </div>
+        <div class="suggestion-usd">
+          <img src="images/resources/s2.png" alt="" />
+          <div class="sgt-text">
+            <h4>John Doe</h4>
+            <span>PHP Developer</span>
+          </div>
+          <span><i class="fa fa-plus"></i></span>
+        </div>
+        <div class="suggestion-usd">
+          <img src="images/resources/s3.png" alt="" />
+          <div class="sgt-text">
+            <h4>Poonam</h4>
+            <span>Wordpress Developer</span>
+          </div>
+          <span><i class="fa fa-plus"></i></span>
+        </div>
+        <div class="suggestion-usd">
+          <img src="images/resources/s4.png" alt="" />
+          <div class="sgt-text">
+            <h4>Bill Gates</h4>
+            <span>C & C++ Developer</span>
+          </div>
+          <span><i class="fa fa-plus"></i></span>
+        </div>
+        <div class="suggestion-usd">
+          <img src="images/resources/s5.png" alt="" />
+          <div class="sgt-text">
+            <h4>Jessica William</h4>
+            <span>Graphic Designer</span>
+          </div>
+          <span><i class="fa fa-plus"></i></span>
+        </div>
+        <div class="suggestion-usd">
+          <img src="images/resources/s6.png" alt="" />
+          <div class="sgt-text">
+            <h4>John Doe</h4>
+            <span>PHP Developer</span>
+          </div>
+          <span><i class="fa fa-plus"></i></span>
+        </div>
+        <div class="view-more">
+          <a href="#" title="">View More</a>
+        </div>
+      </div>
     </div>
-    <div class="suggestions-list">
-    <div class="suggestion-usd">
-    <img src="images/resources/s1.png" alt="">
-    <div class="sgt-text">
-    <h4>Jessica William</h4>
-    <span>Graphic Designer</span>
-    </div>
-    <span><i class="fa fa-plus"></i></span>
-    </div>
-    <div class="suggestion-usd">
-    <img src="images/resources/s2.png" alt="">
-    <div class="sgt-text">
-    <h4>John Doe</h4>
-    <span>PHP Developer</span>
-    </div>
-    <span><i class="fa fa-plus"></i></span>
-    </div>
-    <div class="suggestion-usd">
-    <img src="images/resources/s3.png" alt="">
-    <div class="sgt-text">
-    <h4>Poonam</h4>
-    <span>Wordpress Developer</span>
-    </div>
-    <span><i class="fa fa-plus"></i></span>
-    </div>
-    <div class="suggestion-usd">
-    <img src="images/resources/s4.png" alt="">
-    <div class="sgt-text">
-    <h4>Bill Gates</h4>
-    <span>C & C++ Developer</span>
-    </div>
-    <span><i class="fa fa-plus"></i></span>
-    </div>
-    <div class="suggestion-usd">
-    <img src="images/resources/s5.png" alt="">
-    <div class="sgt-text">
-    <h4>Jessica William</h4>
-    <span>Graphic Designer</span>
-    </div>
-    <span><i class="fa fa-plus"></i></span>
-    </div>
-    <div class="suggestion-usd">
-    <img src="images/resources/s6.png" alt="">
-    <div class="sgt-text">
-    <h4>John Doe</h4>
-    <span>PHP Developer</span>
-    </div>
-    <span><i class="fa fa-plus"></i></span>
-    </div>
-    <div class="view-more">
-    <a href="#" title="">View More</a>
-    </div>
-    </div>
-    </div>
-    </div>
+  </div>
 
-{% endblock rightContent %}
-
-
-{% block content %}
-<div class="main-ws-sec">
-   
-<div class="user-tab-sec">
-<h3>{% if profile.full_name %}{{profile.full_name}} {% else %}{{profile.user.username}}{% endif %}</h3>
-<div class="star-descp">
-<span>Graphic Designer at Self Employed</span>
-<ul>
-<li><i class="fa fa-star"></i></li>
-<li><i class="fa fa-star"></i></li>
-<li><i class="fa fa-star"></i></li>
-<li><i class="fa fa-star"></i></li>
-<li><i class="fa fa-star-half-o"></i></li>
-</ul>
-</div>
-<div class="post-topbar d-flex align-items-center justify-content-between" style="border-top: 3px solid #ccc;">
-    <div class="">
-        <h3>Biography</h3>
-    </div>
-    <div class="post-st">
+  {% endblock rightContent %} 
+  {% block content %}
+  <div class="main-ws-sec">
+    <!-- User Profile modal -->
+    <div class="modal fade" id="UserProfileModal" data-url="{% url 'post-list-view' %}" tabindex="-1">
+      <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Update Profile</h5>
+                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                      &times;
+                  </button> 
+          </div>       
+          <div class="modal-body">
+              <div class="container-fluid">
+                <div class="process-comm">
+                  <div class="spinner">
+                    <div class="bounce1"></div>
+                    <div class="bounce2"></div>
+                    <div class="bounce3"></div>
+                  </div>
+                </div>
+                 {% comment %} <div class="PreviewImagesContainer">
+                     
+                 </div> {% endcomment %}
+                 <div class="maxFileError">
+                  <p class="errornote">You cannot upload more than 5 images</p>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-center">
+              <button type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" form="UserProfileForm" id="createPostBtn" class="btn btn-sm btn-primary">Update</button>
+              <span class="loading-icon"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+          </div>
+          
+      </div>
+      </div>
+  </div>
+  <!-- end of user profile modal -->
+    <div class="user-tab-sec">
+      <h3>
+        {% if profile.full_name %}{{profile.full_name}} {% else
+        %}{{profile.user.username}}{% endif %}
+      </h3>
+      <div class="star-descp">
+        <span>Graphic Designer at Self Employed</span>
         <ul>
-            <li><a class="" href="" title=""><i class="fa fa-angle-down" aria-hidden="true"></i></a></li>
+          <li><i class="fa fa-star"></i></li>
+          <li><i class="fa fa-star"></i></li>
+          <li><i class="fa fa-star"></i></li>
+          <li><i class="fa fa-star"></i></li>
+          <li><i class="fa fa-star-half-o"></i></li>
         </ul>
+      </div>
+      <div
+        class="post-topbar d-flex align-items-center justify-content-between"
+        style="border-top: 3px solid #ccc"
+      >
+        <div class="">
+          <h3>Biography</h3>
+        </div>
+        <div class="post-st">
+          <ul>
+            <li>
+              <a class="" href="" title=""
+                ><i class="fa fa-angle-down" aria-hidden="true"></i
+              ></a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-</div>
-</div>
-<div class="product-feed-tab current" id="feed-dd">
-<div class="posts-section">
-<div class="post-bar">
-<div class="post_topbar">
-<div class="usy-dt">
-<img src="images/resources/us-pic.png" alt="">
-<div class="usy-name">
-<h3>John Doe</h3>
-<span><img src="images/clock.png" alt="">3 min ago</span>
-</div>
-</div>
-<div class="ed-opts">
-<a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
-<ul class="ed-options">
-<li><a href="#" title="">Edit Post</a></li>
-<li><a href="#" title="">Unsaved</a></li>
-<li><a href="#" title="">Unbid</a></li>
-<li><a href="#" title="">Close</a></li>
-<li><a href="#" title="">Hide</a></li>
-</ul>
-</div>
-</div>
-<div class="epi-sec">
-<ul class="descp">
-<li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
-<li><img src="images/icon9.png" alt=""><span>India</span></li>
-</ul>
-<ul class="bk-links">
-<li><a href="#" title=""><i class="fa fa-bookmark"></i></a></li>
-<li><a href="#" title=""><i class="fa fa-envelope"></i></a></li>
-</ul>
-</div>
-<div class="job_descp">
-<h3>Senior Wordpress Developer</h3>
-<ul class="job-dt">
-<li><a href="#" title="">Full Time</a></li>
-<li><span>$30 / hr</span></li>
-</ul>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus hendrerit metus, ut ullamcorper quam finibus at. Etiam id magna sit amet... <a href="#" title="">view more</a></p>
-<ul class="skill-tags">
-<li><a href="#" title="">HTML</a></li>
-<li><a href="#" title="">PHP</a></li>
-<li><a href="#" title="">CSS</a></li>
-<li><a href="#" title="">Javascript</a></li>
-<li><a href="#" title="">Wordpress</a></li>
-</ul>
-</div>
-<div class="job-status-bar">
-<ul class="like-com">
-<li>
-<a href="#"><i class="fas fa-heart"></i> Like</a>
-<img src="images/liked-img.png" alt="">
-<span>25</span>
-</li>
-<li><a href="#" class="com"><i class="fas fa-comment-alt"></i> Comments 15</a></li>
-</ul>
-<a href="#"><i class="fas fa-eye"></i>Views 50</a>
-</div>
-</div>
-<div class="post-bar">
-<div class="post_topbar">
-<div class="usy-dt">
-<img src="images/resources/us-pic.png" alt="">
-<div class="usy-name">
-<h3>John Doe</h3>
-<span><img src="images/clock.png" alt="">3 min ago</span>
-</div>
-</div>
-<div class="ed-opts">
-<a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
-<ul class="ed-options">
-<li><a href="#" title="">Edit Post</a></li>
-<li><a href="#" title="">Unsaved</a></li>
-<li><a href="#" title="">Unbid</a></li>
-<li><a href="#" title="">Close</a></li>
-<li><a href="#" title="">Hide</a></li>
-</ul>
-</div>
-</div>
-<div class="epi-sec">
-<ul class="descp">
-<li><img src="images/icon8.png" alt=""><span>Front End Developer</span></li>
-<li><img src="images/icon9.png" alt=""><span>India</span></li>
-</ul>
-<ul class="bk-links">
-<li><a href="#" title=""><i class="fa fa-bookmark"></i></a></li>
-<li><a href="#" title=""><i class="fa fa-envelope"></i></a></li>
-<li><a href="#" title="" class="bid_now">Bid Now</a></li>
-</ul>
-</div>
-<div class="job_descp">
-<h3>Simple Classified Site</h3>
-<ul class="job-dt">
-<li><span>$300 - $350</span></li>
-</ul>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus hendrerit metus, ut ullamcorper quam finibus at. Etiam id magna sit amet... <a href="#" title="">view more</a></p>
-<ul class="skill-tags">
-<li><a href="#" title="">HTML</a></li>
-<li><a href="#" title="">PHP</a></li>
-<li><a href="#" title="">CSS</a></li>
-<li><a href="#" title="">Javascript</a></li>
-<li><a href="#" title="">Wordpress</a></li>
-</ul>
-</div>
-<div class="job-status-bar">
-<ul class="like-com">
-<li>
-<a href="#"><i class="fas fa-heart"></i> Like</a>
-<img src="images/liked-img.png" alt="">
-<span>25</span>
-</li>
-<li><a href="#" class="com"><i class="fas fa-comment-alt"></i> Comments 15</a></li>
-</ul>
-<a href="#"><i class="fas fa-eye"></i>Views 50</a>
-</div>
-</div>
-<div class="post-bar">
-<div class="post_topbar">
-<div class="usy-dt">
-<img src="images/resources/us-pc2.png" alt="">
-<div class="usy-name">
-<h3>John Doe</h3>
-<span><img src="images/clock.png" alt="">3 min ago</span>
-</div>
-</div>
-<div class="ed-opts">
-<a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
-<ul class="ed-options">
-<li><a href="#" title="">Edit Post</a></li>
-<li><a href="#" title="">Unsaved</a></li>
-<li><a href="#" title="">Unbid</a></li>
-<li><a href="#" title="">Close</a></li>
-<li><a href="#" title="">Hide</a></li>
-</ul>
-</div>
-</div>
-<div class="epi-sec">
-<ul class="descp">
-<li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
-<li><img src="images/icon9.png" alt=""><span>India</span></li>
-</ul>
-<ul class="bk-links">
-<li><a href="#" title=""><i class="fa fa-bookmark"></i></a></li>
-<li><a href="#" title=""><i class="fa fa-envelope"></i></a></li>
-</ul>
-</div>
-<div class="job_descp">
-<h3>Senior UI / UX designer</h3>
-<ul class="job-dt">
-<li><a href="#" title="">Par Time</a></li>
-<li><span>$10 / hr</span></li>
-</ul>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus hendrerit metus, ut ullamcorper quam finibus at. Etiam id magna sit amet... <a href="#" title="">view more</a></p>
-<ul class="skill-tags">
-<li><a href="#" title="">HTML</a></li>
-<li><a href="#" title="">PHP</a></li>
-<li><a href="#" title="">CSS</a></li>
-<li><a href="#" title="">Javascript</a></li>
-<li><a href="#" title="">Wordpress</a></li>
-</ul>
-</div>
-<div class="job-status-bar">
-<ul class="like-com">
-<li>
-<a href="#"><i class="fas fa-heart"></i> Like</a>
-<img src="images/liked-img.png" alt="">
-<span>25</span>
-</li>
-<li><a href="#" class="com"><i class="fas fa-comment-alt"></i> Comments 15</a></li>
-</ul>
-<a href="#"><i class="fas fa-eye"></i>Views 50</a>
-</div>
-</div>
-<div class="post-bar">
-<div class="post_topbar">
-<div class="usy-dt">
-<img src="images/resources/us-pic.png" alt="">
-<div class="usy-name">
-<h3>John Doe</h3>
-<span><img src="images/clock.png" alt="">3 min ago</span>
-</div>
-</div>
-<div class="ed-opts">
-<a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
-<ul class="ed-options">
-<li><a href="#" title="">Edit Post</a></li>
-<li><a href="#" title="">Unsaved</a></li>
-<li><a href="#" title="">Unbid</a></li>
-<li><a href="#" title="">Close</a></li>
-<li><a href="#" title="">Hide</a></li>
-</ul>
-</div>
-</div>
-<div class="epi-sec">
-<ul class="descp">
-<li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
-<li><img src="images/icon9.png" alt=""><span>India</span></li>
-</ul>
-<ul class="bk-links">
-<li><a href="#" title=""><i class="fa fa-bookmark"></i></a></li>
-<li><a href="#" title=""><i class="fa fa-envelope"></i></a></li>
-<li><a href="#" title="" class="bid_now">Bid Now</a></li>
-</ul>
-</div>
-<div class="job_descp">
-<h3>Ios Shopping mobile app</h3>
-<ul class="job-dt">
-<li><span>$300 - $350</span></li>
-</ul>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus hendrerit metus, ut ullamcorper quam finibus at. Etiam id magna sit amet... <a href="#" title="">view more</a></p>
-<ul class="skill-tags">
-<li><a href="#" title="">HTML</a></li>
-<li><a href="#" title="">PHP</a></li>
-<li><a href="#" title="">CSS</a></li>
-<li><a href="#" title="">Javascript</a></li>
-<li><a href="#" title="">Wordpress</a></li>
-</ul>
-</div>
-<div class="job-status-bar">
-<ul class="like-com">
-<li>
-<a href="#"><i class="fas fa-heart"></i> Like</a>
-<img src="images/liked-img.png" alt="">
-<span>25</span>
-</li>
-<li><a href="#" class="com"><i class="fas fa-comment-alt"></i> Comments 15</a></li>
-</ul>
-<a href="#"><i class="fas fa-eye"></i>Views 50</a>
-</div>
-</div>
-<div class="process-comm">
-<div class="spinner">
-<div class="bounce1"></div>
-<div class="bounce2"></div>
-<div class="bounce3"></div>
-</div>
-</div>
-</div>
-</div>
-<div class="product-feed-tab" id="info-dd">
-<div class="user-profile-ov">
-<h3>Overview</h3>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam lectus commodo viverra. Nunc eu augue nec arcu efficitur faucibus. Aliquam accumsan ac magna convallis bibendum. Quisque laoreet augue eget augue fermentum scelerisque. Vivamus dignissim mollis est dictum blandit. Nam porta auctor neque sed congue. Nullam rutrum eget ex at maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget vestibulum lorem.</p>
-</div>
-<div class="user-profile-ov st2">
-<h3>Experience</h3>
-<h4>Web designer</h4>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam lectus commodo viverra. </p>
-<h4>UI / UX Designer</h4>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor aliquam felis, nec condimentum ipsum commodo id.</p>
-<h4>PHP developer</h4>
-<p class="no-margin">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam lectus commodo viverra. </p>
-</div>
-<div class="user-profile-ov">
-<h3>Education</h3>
-<h4>Master of Computer Science</h4>
-<span>2015 - 2018</span>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam lectus commodo viverra. </p>
-</div>
-<div class="user-profile-ov">
-<h3>Location</h3>
-<h4>India</h4>
-<p>151/4 BT Chownk, Delhi </p>
-</div>
-<div class="user-profile-ov">
-<h3>Skills</h3>
-<ul>
-<li><a href="#" title="">HTML</a></li>
-<li><a href="#" title="">PHP</a></li>
-<li><a href="#" title="">CSS</a></li>
-<li><a href="#" title="">Javascript</a></li>
-<li><a href="#" title="">Wordpress</a></li>
-<li><a href="#" title="">Photoshop</a></li>
-<li><a href="#" title="">Illustrator</a></li>
-<li><a href="#" title="">Corel Draw</a></li>
-</ul>
-</div>
-</div>
-<div class="product-feed-tab" id="portfolio-dd">
-<div class="portfolio-gallery-sec">
-<h3>Portfolio</h3>
-<div class="gallery_pf">
-<div class="row">
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img1.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img2.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img3.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img4.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img5.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img6.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img7.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img8.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img9.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-<div class="col-lg-4 col-md-4 col-sm-6 col-6">
-<div class="gallery_pt">
-<img src="images/resources/pf-img10.jpg" alt="">
-<a href="#" title=""><img src="images/all-out.png" alt=""></a>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-{% endblock content %}
-{% block leftContent %}
-<div class="right-sidebar">
+    <div class="product-feed-tab current" id="feed-dd">
+      <div class="posts-section">
+        {% for post in posts %} 
+                <div class="post-bar">
+                    <div class="post_topbar">
+
+                        <div class="usy-dt">
+                            <img src="{{post.author.profile.avatar.url}}" alt="post author">
+                            <div class="usy-name">
+                                <h3>{{post.author.username}}</h3>
+                                <span><i class="fa fa-clock-o" aria-hidden="true"></i>{{post.date_posted|age}} ago</span>
+                            </div>
+                        </div>
+                        <div class="ed-opts">
+                            <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
+                            <ul class="ed-options">
+                                <li><a data-bs-toggle="modal" id="{{post.post_slug}}" href="#UpdatePostModal" role="button"><i class="fas fa-edit mr-2"></i> Edit Post</a></li>
+                                <li><a href="#"  title=""><i class="fa fa-eye-slash mr-2"></i>Hide</a></li>
+                                <li><a href="#DeletePostModal" data-bs-toggle="modal" data-slug="{{post.post_slug}}" title=""> <i class="fas fa-trash-alt mr-2"></i>Delete </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="epi-sec">
+                        <ul class="descp">
+                            <li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
+                            <li><img src="images/icon9.png" alt=""><span>India</span></li>
+                        </ul>
+                        <ul class="bk-links">
+                            <li><a href="#" title=""><i class="fa fa-share" aria-hidden="true"></i></a></li>
+                            <li class="follow"><span>Follow</span></li>
+                        </ul>
+                    </div>
+                    <div class="job_descp">  
+                        <p> {{post.content}}<a href="#" title="">view more</a></p>
+                        {% for image in post.images.all %}
+                            {% if forloop.first %}
+                                <div class="PreviewImagesContainer">
+                                <div class="post-images reverse">
+                            {% endif %}
+                            
+                            {% if forloop.counter|create_second_div_once %}
+                                    <div class="second_child_row">
+                                        {% for image in post.images.all %}
+                                            {% if not forloop.counter|divisibleby:3 and not forloop.counter|divisibleby:5 %}
+                                                <div class="post-images__child">
+                                                    <img src="{{image.image.url}}" alt="post-image" />
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                            {% endif %}
+
+                            {% if forloop.counter|create_first_div_once %}
+                                    <div class="second_child_row">
+                                        {% for image in post.images.all %}
+                                            {% if forloop.counter|divisibleby:3 or forloop.counter|divisibleby:5 %}
+                                                <div class="post-images__child">
+                                                    <img src="{{image.image.url}}" alt="post-image" />
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                            {% endif %}
+
+                            {% if forloop.last %}
+                                </div></div>
+                            {% endif %}
+                        {% endfor %}
+
+                <div class="job-status-bar d-flex align-items-center justify-content-around py-1">                    
+                    <button class="com" name="PostLike" data-slug="post_like_{{post.post_slug}}">
+                        <i class=" {% if request.user in post.likes.all %} is-liked fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
+                         Like <span class="likes-count">{{post.likes.all.count}}</span>
+                    </button>
+                    <button class="com" name="PostComments">
+                        <i class="far fa-comment-alt"></i> Comment <span class="{{post.post_slug}}_comments_count">{{post.comments.all.count}}</span>
+                    </button>
+                    <div class="post-views" style="cursor:default;"><i class="far fa-eye mr-1"></i>Views 50</div>
+                </div>
+                <div class="post-comment-{{post.post_slug}} mt-4">
+                    {% for comment in post.comments.all|two_last_comments %}
+                        {% if forloop.first %}
+                         <div class="comment-section">
+                            <div class="comment-sec">{% endif %}
+                                <ul>
+                                    <li>
+                                        <div class="comment-list">
+                                            <div class="bg-img">
+                                                <img src="{{comment.author.profile.avatar.url}}" style="width: 40px;" alt="">
+                                            </div> 
+                                            <div class="comment"> 
+                                                <h3>{{comment.author.username}}</h3>
+                                                <div> 
+                                                    <p>{{comment.content}}</p>
+                                                </div>
+                                                <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
+                                                <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> {{comment.date_commented|timesince}}</span>
+                                                {% if request.user != comment.author %}
+                                                    <span name="PostLike"  class="com-action">
+                                                        <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
+                                                        <span class="likes-count" style="display:inline;">{{comment.likes.all.count}}</span>
+                                                    </span>
+                                                {% endif %}
+                                                <span id="comment_delete_{{comment.comment_slug}}" class="com-action">
+                                                    <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
+                                                </span>
+                                            </div>
+                                        </div>           
+                                    </li>
+                                </ul>
+
+                        {% if forloop.last %}
+                            </div>
+                        </div>{% endif %}
+                    {% endfor %}
+                    <div class="comment_box">             
+                        <div class="cm_img">
+                            <img src="/static/landing/images/bg-img4.png" alt="">
+                        </div>
+                        <form method="post" data-slug="{{post.post_slug}}">
+                            {% csrf_token %}
+                            <textarea name="content" placeholder="Comment on this post here..." cols="40" rows="2" required="" id="id_content"></textarea>
+                            <button id="" name="commentpost" >Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+            {% endfor %}
+        
+        <div class="process-comm">
+          <div class="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="product-feed-tab" id="info-dd">
+      <div class="user-profile-ov">
+        <h3>Overview</h3>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+          tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit
+          amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam
+          lectus commodo viverra. Nunc eu augue nec arcu efficitur faucibus.
+          Aliquam accumsan ac magna convallis bibendum. Quisque laoreet augue
+          eget augue fermentum scelerisque. Vivamus dignissim mollis est dictum
+          blandit. Nam porta auctor neque sed congue. Nullam rutrum eget ex at
+          maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          Donec eget vestibulum lorem.
+        </p>
+      </div>
+      <div class="user-profile-ov st2">
+        <h3>Experience</h3>
+        <h4>Web designer</h4>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+          tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit
+          amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam
+          lectus commodo viverra.
+        </p>
+        <h4>UI / UX Designer</h4>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+          tempor aliquam felis, nec condimentum ipsum commodo id.
+        </p>
+        <h4>PHP developer</h4>
+        <p class="no-margin">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+          tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit
+          amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam
+          lectus commodo viverra.
+        </p>
+      </div>
+      <div class="user-profile-ov">
+        <h3>Education</h3>
+        <h4>Master of Computer Science</h4>
+        <span>2015 - 2018</span>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+          tempor aliquam felis, nec condimentum ipsum commodo id. Vivamus sit
+          amet augue nec urna efficitur tincidunt. Vivamus consectetur aliquam
+          lectus commodo viverra.
+        </p>
+      </div>
+      <div class="user-profile-ov">
+        <h3>Location</h3>
+        <h4>India</h4>
+        <p>151/4 BT Chownk, Delhi</p>
+      </div>
+      <div class="user-profile-ov">
+        <h3>Skills</h3>
+        <ul>
+          <li><a href="#" title="">HTML</a></li>
+          <li><a href="#" title="">PHP</a></li>
+          <li><a href="#" title="">CSS</a></li>
+          <li><a href="#" title="">Javascript</a></li>
+          <li><a href="#" title="">Wordpress</a></li>
+          <li><a href="#" title="">Photoshop</a></li>
+          <li><a href="#" title="">Illustrator</a></li>
+          <li><a href="#" title="">Corel Draw</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="product-feed-tab" id="portfolio-dd">
+      <div class="portfolio-gallery-sec">
+        <h3>Portfolio</h3>
+        <div class="gallery_pf">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img1.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img2.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img3.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img4.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img5.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img6.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img7.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img8.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img9.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6">
+              <div class="gallery_pt">
+                <img src="images/resources/pf-img10.jpg" alt="" />
+                <a href="#" title=""><img src="images/all-out.png" alt="" /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock content %} {% block leftContent %}
+  <div class="right-sidebar">
     <div class="message-btn">
-    <a href="#" title=""><i class="fa fa-envelope"></i> Message</a>
+      <a href="#" title=""><i class="fa fa-envelope"></i> Message</a>
     </div>
     <div class="widget widget-portfolio">
-    <div class="wd-heady">
-    <h3>Portfolio</h3>
-    <img src="images/photo-icon.png" alt="">
-    </div>
-    <div class="pf-gallery">
+      <div class="wd-heady">
+        <h3>Portfolio</h3>
+        <img src="images/photo-icon.png" alt="" />
+      </div>
+      <div class="pf-gallery">
         <ul>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery1.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery2.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery3.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery4.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery5.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery6.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery7.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery8.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery9.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery10.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery11.png" alt=""></a></li>
-            <li><a href="#" title=""><img src="images/resources/pf-gallery12.png" alt=""></a></li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery1.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery2.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery3.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery4.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery5.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery6.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery7.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery8.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery9.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery10.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery11.png" alt=""
+            /></a>
+          </li>
+          <li>
+            <a href="#" title=""
+              ><img src="images/resources/pf-gallery12.png" alt=""
+            /></a>
+          </li>
         </ul>
+      </div>
     </div>
+    {% endblock leftContent %}
+  </div>
 </div>
-{% endblock leftContent %}

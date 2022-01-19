@@ -5,7 +5,7 @@
 {% block header %} {% include 'landing/partials/header.html' %}{% endblock header %} 
 
     {% block rightContent %}
-    <div class="main-left-sidebar no-margin">
+    <div class="main-left-sidebar no-margin sticky-top">
         <div class="user-data full-width">
         <div class="user-profile">
         <div class="username-dt">
@@ -305,7 +305,7 @@
                         {% endfor %}
 
                 <div class="job-status-bar d-flex align-items-center justify-content-around py-1">                    
-                    <button class="com" name="PostLike" data-slug="{{post.post_slug}}">
+                    <button class="com" name="PostLike" data-slug="post_like_{{post.post_slug}}">
                         <i class=" {% if request.user in post.likes.all %} is-liked fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
                          Like <span class="likes-count">{{post.likes.all.count}}</span>
                     </button>
@@ -314,25 +314,31 @@
                     </button>
                     <div class="post-views" style="cursor:default;"><i class="far fa-eye mr-1"></i>Views 50</div>
                 </div>
-                <div class="post-comment mt-4">
+                <div class="post-comment-{{post.post_slug}} mt-4">
                     {% for comment in post.comments.all|two_last_comments %}
-                        {% if forloop.first %} <div class="comment-section">
+                        {% if forloop.first %}
+                         <div class="comment-section">
                             <div class="comment-sec">{% endif %}
                                 <ul>
                                     <li>
                                         <div class="comment-list">
                                             <div class="bg-img">
-                                                <img src="{{post.author.profile.avatar.url}}" style="width: 40px;" alt="">
-                                            </div>
+                                                <img src="{{comment.author.profile.avatar.url}}" style="width: 40px;" alt="">
+                                            </div> 
                                             <div class="comment"> 
-                                                <h3>{{post.author.username}}</h3>
+                                                <h3>{{comment.author.username}}</h3>
                                                 <div> 
                                                     <p>{{comment.content}}</p>
                                                 </div>
                                                 <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
                                                 <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> {{comment.date_commented|timesince}}</span>
-                                                <span id="comment_like_{{comment.id}}" class="com-action"><i class="far fa-thumbs-up"></i></span>
-                                                <span id="comment_delete_{{comment.id}}" class="com-action">
+                                                {% if request.user != comment.author %}
+                                                    <span name="PostLike"  class="com-action">
+                                                        <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
+                                                        <span class="likes-count" style="display:inline;">{{comment.likes.all.count}}</span>
+                                                    </span>
+                                                {% endif %}
+                                                <span id="comment_delete_{{comment.comment_slug}}" class="com-action">
                                                     <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
                                                 </span>
                                             </div>
@@ -340,12 +346,14 @@
                                     </li>
                                 </ul>
 
-                        {% if forloop.last %}</div></div>{% endif %}
+                        {% if forloop.last %}
+                            </div>
+                        </div>{% endif %}
                     {% endfor %}
-                    <div class="cm_img">
-                        <img src="/static/landing/images/bg-img4.png" alt="">
-                    </div>
                     <div class="comment_box">             
+                        <div class="cm_img">
+                            <img src="/static/landing/images/bg-img4.png" alt="">
+                        </div>
                         <form method="post" data-slug="{{post.post_slug}}">
                             {% csrf_token %}
                             <textarea name="content" placeholder="Comment on this post here..." cols="40" rows="2" required="" id="id_content"></textarea>
@@ -624,7 +632,7 @@
 
 
     {% block leftContent %}
-        <div class="widget widget-about">
+        <div class="widget widget-about sticky-top">
             <img src="images/wd-logo.png" alt="">
             <h3>Track Time on Workwise</h3>
             <span>Pay only for the Hours worked</span>
@@ -633,64 +641,5 @@
                 <a href="#" title="">Learn More</a>
             </div>
         </div>
-        <div class="widget suggestions full-width">
-            <div class="sd-title">
-            <h3>Most Viewed People</h3>
-            <i class="fa fa-ellipsis-v"></i>
-            </div>
-            <div class="suggestions-list">
-            <div class="suggestion-usd">
-            <img src="{% static 'landing/images/s1.png' %}" alt="">
-            <div class="sgt-text">
-            <h4>Jessica William</h4>
-            <span>Graphic Designer</span>
-            </div>
-            <span><i class="fa fa-plus"></i></span>
-            </div>
-            <div class="suggestion-usd">
-            <img src="{% static 'landing/images/s2.png' %}" alt="">
-            <div class="sgt-text">
-            <h4>John Doe</h4>
-            <span>PHP Developer</span>
-            </div>
-            <span><i class="fa fa-plus"></i></span> 
-            </div>
-            <div class="suggestion-usd">
-            <img src="{% static 'landing/images/s3.png' %}" alt="">
-            <div class="sgt-text">
-            <h4>Poonam</h4>
-            <span>Wordpress Developer</span>
-            </div>
-            <span><i class="fa fa-plus"></i></span>
-            </div>
-            <div class="suggestion-usd">
-            <img src="{% static 'landing/images/s4.png' %}" alt="">
-            <div class="sgt-text">
-            <h4>Bill Gates</h4>
-            <span>C &amp; C++ Developer</span>
-            </div>
-            <span><i class="fa fa-plus"></i></span>
-            </div>
-            <div class="suggestion-usd">
-            <img src="images/resources/s5.png" alt="">
-            <div class="sgt-text">
-            <h4>Jessica William</h4>
-            <span>Graphic Designer</span>
-            </div>
-            <span><i class="fa fa-plus"></i></span>
-            </div>
-            <div class="suggestion-usd">
-            <img src="{% static 'landing/images/s6.png' %}" alt="">
-            <div class="sgt-text">
-            <h4>John Doe</h4>
-            <span>PHP Developer</span>
-            </div>
-            <span><i class="fa fa-plus"></i></span>
-            </div>
-            <div class="view-more">
-            <a href="#" title="">View More</a>
-            </div>
-            </div>
-            </div>
     
     {% endblock leftContent %}

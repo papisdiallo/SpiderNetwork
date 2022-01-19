@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     # installed apps
     'landing.apps.LandingConfig',
     'social.apps.SocialConfig',
+    'Connection.apps.ConnectionConfig',
     'crispy_forms',
 ]
 

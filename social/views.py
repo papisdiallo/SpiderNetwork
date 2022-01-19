@@ -5,7 +5,7 @@ from django.views import View
 from django.http import JsonResponse
 from .models import Post, Files, UserProfile, Comment
 from django.template.loader import render_to_string
-from .forms import PostForm, CommentPostForm
+from .forms import PostForm, CommentPostForm, UserProfileForm
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -122,8 +122,19 @@ class DetailPostView(View):
 
 class UserProfileView(View):
     def get(self, request, user_slug, *args, **kwargs):
+        form = UserProfileForm()
         profile = get_object_or_404(UserProfile, profile_slug=user_slug)
-        context = {"profile": profile, }
+        current_user = request.user
+        posts = Post.objects.filter(author__profile__profile_slug=user_slug)
+        # We have different state depending on who is looking to the profile and the
+        # relationship that they do have with the owner of the profile
+        # first case the user is looking to his own profile
+        is_profile_owner = True  # just a default value
+        if profile.user == current_user:
+            is_profile_owner = True
+        else:  # that means the user is looking to another user profile
+            pass
+        context = {"profile": profile, "posts": posts, "form": form}
         return render(request, "landing/profile.html", context)
 
 
@@ -136,12 +147,10 @@ class CreateCommentPostView(View):
         post = get_object_or_404(Post, post_slug=post_slug)
         form = CommentPostForm(request.POST or None)
         if is_ajax(request=request) and form.is_valid():
-            print("the form is valid and the request is ajax")
             comment_post = form.save(commit=False)
-            print(form.cleaned_data.get("content"))
             comment_post.author = request.user
             comment_post.post = post
-            comment_post.save()
+            # comment_post.save()
             jsonInstance = serializers.serialize(
                 "json",
                 [
@@ -170,15 +179,32 @@ class DeleteCommentPostView(View):
 
 
 class AddRemovePostLikes(View):
-    def get(self, request, post_slug, *args, **kwargs):
+    def post(self, request, post_or_comment_slug, *args, **kwargs):
         if is_ajax(request=request):
-            post = get_object_or_404(Post, post_slug=post_slug)
-            is_liked = post.likes.filter(
-                username=request.user.username).exists()
-            if not is_liked:
-                post.likes.add(request.user)
-                post.save()
+            liked_a = request.POST.get("liked_a")
+            print(liked_a)
+            is_liked = None
+            if liked_a == "comment":
+                comment = get_object_or_404(
+                    Comment, comment_slug=post_or_comment_slug)
+                is_liked = comment.likes.filter(
+                    username=request.user.username).exists()
+                if not is_liked:
+                    comment.likes.add(request.user)
+                    comment.save()  # do not thing this step is necessary though
+                else:
+                    comment.likes.remove(request.user)
+                    comment.save()
             else:
-                post.likes.remove(request.user)
-                post.save()
+                post = get_object_or_404(Post, post_slug=post_or_comment_slug)
+                is_liked = post.likes.filter(
+                    username=request.user.username).exists()
+                if not is_liked:
+                    post.likes.add(request.user)
+                    post.save()
+                else:
+                    post.likes.remove(request.user)
+                    post.save()
+            if request.user == post.author:
+                return JsonResponse({"is_liked": "Not accepted"})
             return JsonResponse({"is_liked": is_liked})

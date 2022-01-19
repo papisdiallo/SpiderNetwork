@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment
+from .models import Post, Comment, UserProfile
 from crispy_forms.helper import FormHelper
 from django.forms.widgets import HiddenInput
 from crispy_forms.bootstrap import AppendedText, PrependedText, FormActions
@@ -50,3 +50,15 @@ class CommentPostForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ("content",)
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ("avatar", "bio", "birth_date", "location", "full_name",)
+
+    def __init__(self, *args, disabled_field=True, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        # self.fields["images"].widget = HiddenInput()
+        self.helper = FormHelper()
+        self.helper.form_id = "UserProfileForm"

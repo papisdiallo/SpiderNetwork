@@ -16,6 +16,6 @@ urlpatterns = [
          s_views.CreateCommentPostView.as_view(), name="create-postcomment-view"),
     path('delete-comment-post/<int:comment_id>/',
          s_views.DeleteCommentPostView.as_view(), name="delete-postcomment-view"),
-    path('like-post/<slug:post_slug>/',
+    path('like-post/<slug:post_or_comment_slug>/',
          s_views.AddRemovePostLikes.as_view(), name="like-post")
 ]
