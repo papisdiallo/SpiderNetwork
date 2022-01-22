@@ -11,8 +11,11 @@ from crispy_forms.utils import render_crispy_form
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.decorators.csrf import requires_csrf_token
 from django.core.files.storage import FileSystemStorage
+from Connection.models import ForgeLink, ConnectionsList
 from django.core import serializers
 import json
+from django.template.loader import render_to_string
+from Connection.utils import get_forge_link_or_false
 
 
 def is_ajax(request):
@@ -120,21 +123,55 @@ class DetailPostView(View):
         # of the post itself
 
 
-class UserProfileView(View):
+class UserProfileView(LoginRequiredMixin, View):
     def get(self, request, user_slug, *args, **kwargs):
+        noPadding = True  # this will help remove the padding in the profile page
         form = UserProfileForm()
         profile = get_object_or_404(UserProfile, profile_slug=user_slug)
         current_user = request.user
         posts = Post.objects.filter(author__profile__profile_slug=user_slug)
-        # We have different state depending on who is looking to the profile and the
+        # We have different states depending on who is looking to the profile and the
         # relationship that they do have with the owner of the profile
-        # first case the user is looking to his own profile
-        is_profile_owner = True  # just a default value
+        ForgetLinkStatus = None  # by default
+        forgeLink_id = None
+        connections = None
+        con_request = ForgetLink.objects.get(receiver=profile.user)
+        is_profile_owner = True  # by default
+        are_connected = False  # by default
         if profile.user == current_user:
+            # CASE 1 user looking to his own profile
             is_profile_owner = True
-        else:  # that means the user is looking to another user profile
-            pass
-        context = {"profile": profile, "posts": posts, "form": form}
+        else:  # that means the user is looking to another user's profile
+            is_profile_owner = False
+            # getting all the connectins of the current profile
+            con_list = ConnectionsList.objects.get(user=profile.user)
+            connections = con_list.connections.all()
+            if current_user in connections:  # CASE 2
+                are_connected = True  # means they are connected
+            else:
+                are_connected = False
+                if get_forge_link_or_false(sender=profile.user, receiver=current_user) != False:
+                    # means they sent you a forge link CASE 3
+                    ForgeLinkStatus = 2
+                    forgeLink_id = get_forget_link_or_false(
+                        sender=profile.user, receiver=current_user).id
+                elif get_forge_link_or_false(sender=current_user, receiver=profile.user) != False:
+                    # means you sent them a forge link CASE 4
+                    ForgeLinkStatus = 1
+                    forgeLink_id = get_forget_link_or_false(
+                        sender=current_user, receiver=profile.user).id
+                else:  # means none of you sent the other a forget link CASE 5
+                    ForgeLinkStatus = 0
+
+        context = {
+            "profile": profile, "posts": posts,
+            "form": form, "no_padding": noPadding,
+            "is_profile_owner": is_profile_owner,
+            "forgeLink_id": forgeLink_id,
+            "ForgeLinkStatus": ForgetLinkStatus,
+            "connections": connections,
+            "con_request": con_request,
+        }
         return render(request, "landing/profile.html", context)
 
 

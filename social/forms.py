@@ -56,9 +56,13 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ("avatar", "bio", "birth_date", "location", "full_name",)
+        widgets = {
+            # "avatar": forms.TextInput(attrs={"onchange": "readImageurl();", "label": ""})
+        }
 
     def __init__(self, *args, disabled_field=True, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
         # self.fields["images"].widget = HiddenInput()
         self.helper = FormHelper()
         self.helper.form_id = "UserProfileForm"
+        self.helper.form_class = "d-none"

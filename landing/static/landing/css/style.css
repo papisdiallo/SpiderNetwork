@@ -971,8 +971,9 @@ nav > ul > li > a:hover {
 .user-info {
   float: left;
   width: 100%;
-  padding: 13px 10px 0;
+  padding: 10px 10px 0;
   position: relative;
+  cursor: pointer;
 }
 .user-account-settingss {
   position: absolute;
@@ -1107,7 +1108,7 @@ nav > ul > li > a:hover {
   -o-border-radius: 100px;
   border-radius: 100px;
   width: 40px;
-  padding-bottom: 5px;
+  margin-left: 5px;
 }
 .user-info a {
   color: #fff;
@@ -1121,10 +1122,10 @@ nav > ul > li > a:hover {
 }
 .user-info > i {
   position: absolute;
-  top: 51%;
+  top: 63%;
   right: 10px;
   color: #fff;
-  font-size: 12px;
+  font-size: 14px;
   -webkit-transform: translateY(-50%);
   -moz-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
@@ -3013,8 +3014,8 @@ select {
   background: #f2f2f2;
   padding: 10px;
   border-radius: 50%;
-  color: #682747;
-  border: 2px solid #682747;
+  color: #000 !important;
+  border: 2px solid #686868;
 }
 .footy-sec ul li a {
   display: inline-block;
@@ -3103,6 +3104,8 @@ footer {
   text-align: center;
   margin-bottom: 28px;
   margin-top: -95px;
+  background: #ffffff14;
+    border-radius: 10px;
   position: relative;
 }
 .user-pro-img .add-dp {
@@ -3150,6 +3153,7 @@ footer {
   border-radius: 100px;
   float: none;
   border: 5px solid #fff;
+  width: 190px;
 }
 .user_pro_status {
   float: left;
@@ -3225,6 +3229,13 @@ footer {
   padding: 5px 15px;
   border-bottom: 1px solid #e5e5e5;
 }
+.social_links li span {
+  display: flex;
+  font-weight: 500;
+  color: #484848;
+  justify-content: center;
+  line-height: 22px;
+}
 .social_links li a {
   float: left;
   width: 100%;
@@ -3234,16 +3245,38 @@ footer {
   white-space: nowrap;
   overflow: hidden;
   background: #f2f2f2;
-  text-align: center;
+  /* text-align: center; */
   padding: 8px;
   border-radius: 5px;
   font-weight: 500;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#prev_me {
+  width: 100%;
+  max-height: 200px;
+  border: 2px solid #f2f2f2;
+}
+
+#ImageProfilePreview{
+  font-weight: bold;
+    color: black;
+    display: flex;
+    justify-content: center;
+    height: 200px;
+    align-items: center;
+}
+#prof-section ul li a i{
+  pointer-events: none;
 }
 .social_links li a i {
   padding-right: 5px;
   font-size: 20px;
   position: relative;
-  top: 3px;
+  top: -2px;
+  margin-right: 4px
 }
 .la-globe {
   color: #51a5fb;
@@ -3279,7 +3312,7 @@ footer {
 }
 .user-tab-sec h3 {
   color: #000000;
-  font-size: 24px;
+  font-size: 34px;
   font-weight: 600;
   text-transform: capitalize;
   margin-bottom: 15px;

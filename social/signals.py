@@ -5,6 +5,7 @@ from .models import Post, UserProfile, Comment
 from django.contrib.auth.models import User
 import string
 import random
+import os
 from Connection.models import ConnectionsList
 
 
@@ -52,3 +53,21 @@ def post_unique_slug(sender, instance, created, *args, **kwargs):
         # create a ConnectionsList for the new user
         userConnectionsList = ConnectionsList.objects.create(user=instance)
         userConnectionsList.save()  # do not think it is necessary though...
+
+
+@receiver(pre_save, sender=UserProfile)
+def delete_old_file(sender, instance, **kwargs):
+    # on creation, signal callback won't be triggered
+    if instance._state.adding and not instance.pk:
+        return False
+
+    try:
+        old_file = sender.objects.get(pk=instance.pk).avatar
+    except sender.DoesNotExist:
+        return False
+
+    # comparing the new file to the old one
+    file = instance.avatar
+    if not old_file == file:
+        if os.path.isfile(old_file.path):
+            os.remove(old_file.path)

@@ -13,10 +13,14 @@
   {% endblock sectionCover %}
    {% block rightContent %}
   <div class="main-left-sidebar">
-    <div class="user_profile">
+    <div class="user_profile" id="user_profile">
       <div class="user-pro-img position-relative">
         <img src="{{profile.avatar.url}}" alt="" />
-        <span class="profile-image-camera"><i class="fa fa-camera-retro" aria-hidden="true"></i></span>
+        <span class="profile-image-camera">
+          <a name="avatar" href="#UserProfileModal" data-bs-toggle="modal" style="color: #000;">
+            <i class="fa fa-camera" aria-hidden="true" style="pointer-events: none;"></i>
+          </a>
+        </span>
       </div>
       <div class="user_pro_status">
         <ul class="flw-hr">
@@ -39,24 +43,52 @@
       </div>
       <ul class="social_links" id="prof-sections">
         <li>
-          <a data-bs-toggle="modal" href="#UserProfileModal" name="bio" title=""><i class="fa fa-address-book"></i>Add Bio</a>
+          <span class="bio">
+            {% if not is_profile_owner %} <i class="fa fa-address-book mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
+            {% if profile.bio %} {{profile.bio}} {% endif %}
+          </span>
+          {% if is_profile_owner %}  
+          <a data-bs-toggle="modal" href="#UserProfileModal" name="bio" title="">
+            <i class="fa fa-address-book"></i>
+            {% if profile.bio %} Edit {% else %} Add {% endif %} Bio
+          </a>
+          {% endif %}
         </li>
         <li>
+          <span class="full_name">
+            {% if not is_profile_owner %} <i class="fa fa-user mr-2" style="margin-top:-1px;font-size: 21px;"></i> {% endif %}
+            {% if profile.full_name %} {{profile.full_name}}{% endif %}
+          </span>
+          {% if is_profile_owner %}  
           <a data-bs-toggle="modal" href="#UserProfileModal" name="full_name" title="">
             <i class="fa fa-user"></i>
-            Add Your full name</a
-          >
+            {% if profile.full_name %} Edit {% else %} Add {% endif %} Your full name
+          </a>
+          {% endif %}
         </li>
         <li>
-          <a data-bs-toggle="modal" href="#UserProfileModal" name="location" title=""
-            ><i class="fa fa-map-marker-alt"></i>Add Your Location</a
-          >
+          <span class="location">
+            {% if not is_profile_owner %} <i class="fa fa-map-marker-alt mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}
+            {% if profile.location %} {{profile.location}} {% endif %}
+          </span>
+          {% if is_profile_owner %}  
+          <a data-bs-toggle="modal" href="#UserProfileModal" name="location" title="">
+            <i class="fa fa-map-marker-alt"></i>
+            {% if profile.location %} Edit {% else %} Add {% endif %} Your Location
+          </a>
+          {% endif %}
         </li>
         <li>
+          <span class="birth_date">
+            {% if not is_profile_owner %} <i class="fa fa-calendar-plus-o mr-2" style="margin-top: -1px;font-size: 21px;" aria-hidden="true"></i> {% endif %}
+            {% if profile.birth_date %} {{profile.birth_date }} {% endif %}
+          </span>
+          {% if is_profile_owner %}  
           <a data-bs-toggle="modal" href="#UserProfileModal" name="birth_date" title="">
             <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-            Add Birth date</a
-          >
+            {% if profile.birth_date %} Edit {% else %} Add {% endif %} Birth date
+            </a>
+            {% endif %}
         </li>
 
       </ul>
@@ -154,7 +186,7 @@
           </div>
           <div class="modal-footer d-flex justify-content-center">
               <button type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" form="UserProfileForm" id="createPostBtn" class="btn btn-sm btn-primary">Update</button>
+              <button type="submit" form="UserProfileForm" id="UpdateProfileBtn" class="btn btn-sm btn-primary">Update</button>
               <span class="loading-icon"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
           </div>
           
@@ -164,8 +196,7 @@
   <!-- end of user profile modal -->
     <div class="user-tab-sec">
       <h3>
-        {% if profile.full_name %}{{profile.full_name}} {% else
-        %}{{profile.user.username}}{% endif %}
+        {% if profile.full_name %}{{profile.full_name}} {% else %}{{profile.user.username}}{% endif %}
       </h3>
       <div class="star-descp">
         <span>Graphic Designer at Self Employed</span>
@@ -181,17 +212,18 @@
         class="post-topbar d-flex align-items-center justify-content-between"
         style="border-top: 3px solid #ccc"
       >
-        <div class="">
+        <div class="connection-section">
           <h3>Biography</h3>
         </div>
-        <div class="post-st">
-          <ul>
-            <li>
-              <a class="" href="" title=""
-                ><i class="fa fa-angle-down" aria-hidden="true"></i
-              ></a>
-            </li>
-          </ul>
+        <div class="post-st con_sect">
+          <button name="" id="" class="btn btn-primary" >
+            Connections
+            <span>{{connections|length}}</span>
+          </button>
+          <button name="" id="" class="btn btn-dark" >
+            Connection Request <span>{{con_request|length}}</span>
+            <span></span>
+          </button>
         </div>
       </div>
     </div>
