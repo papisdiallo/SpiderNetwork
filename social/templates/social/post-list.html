@@ -10,11 +10,11 @@
         <div class="user-profile">
         <div class="username-dt">
         <div class="usr-pic">
-        <img src="{% static 'landing/images/user-pic.png' %}" alt="">
+        <img src="{{request.user.profile.avatar.url}}" alt="">
         </div>
         </div>
         <div class="user-specs">
-        <h3>John Doe</h3>
+        <h3>{{request.user.username}}</h3>
         <span>Graphic Designer at Self Employed</span>
         </div>
         </div>
@@ -28,7 +28,7 @@
         <span>155</span>
         </li>
         <li>
-        <a href="my-profile-feed.html" title="">View Profile</a>
+        <a href="{% url 'profile-list-view' user_slug=request.user.profile.profile_slug %}" title="">View Profile</a>
         </li>
         </ul>
         </div>

@@ -8,7 +8,11 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.files import File
 import cv2
-from .utils import is_ajax, convertDimensions, save_Base64_Temp_ImageString
+from .utils import (
+    is_ajax, convertDimensions,
+    save_Base64_Temp_ImageString,
+    get_forge_link_or_false
+)
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -32,14 +36,13 @@ def getUserProfileForm(request, profile_slug):
                 # getting the changed field name
                 field_name = form.changed_data[0]
                 field_obj = UserProfile._meta.get_field(field_name)
-                field_value = field_obj.value_from_object(
-                    profile)  # get the new value of the field
+                # get the new value of the field
+                field_value = field_obj.value_from_object(profile)
                 form.save()
                 payload["success"] = True
                 payload["new_value"] = field_value
                 payload["field_name"] = field_name
                 payload["max_size"] = settings.MAX_SIZE_FOR_UPLOAD
-
             else:
                 payload["success"] = False
             return JsonResponse(payload)
@@ -85,29 +88,99 @@ def Sending_Link_Forge(request):
     payload = {}
     user = request.user
     if is_ajax(request=request) and request.method == "POST":
-        receive_profile_slug = request.POST.get("receiver_slug")
-        print(receiver_profile_slug)
+        receiver_profile_slug = request.POST.get("profile_slug")
         receiver = UserProfile.objects.get(
             profile_slug=receiver_profile_slug).user
-        print(receiver)
         try:  # Getting a cancelled request if exists and setting it active again
-            old_Link = ForgeLink.objects.get(
-                sender=user, receiver=receiver)
+            old_Link = ForgeLink.objects.get(sender=user, receiver=receiver)
             if old_Link:
                 if not old_Link.is_active:
                     old_Link.is_active = True  # Setting it back to True
+                    old_Link.save()
+                    payload["success"] = True
+                    payload["profile_owner"] = receiver.username
                 else:
-                    payload["Error"] = "You have already sent a link request to this user"
+                    payload["error"] = "You have already sent a link request to this user"
             else:  # means there is not old request at all
                 new_con = ForgeLink.objects.create(
                     sender=user, receiver=receiver)
                 new_con.save()
-                print(new_con.id)
-                payload["success"] = "Request sent successfully !"
+                payload["success"] = True
+                payload["profile_owner"] = receiver.username
         except ForgeLink.DoesNotExist:
             new_con = ForgeLink.objects.create(
                 sender=user, receiver=receiver)
             new_con.save()
-            print(new_con.id)
-            payload["success"] = "Request sent successfully !"
+            payload["success"] = True
+            payload["profile_owner"] = receiver.username
+    return JsonResponse(payload)
+
+
+@login_required
+def cancelForgeLink(request):
+    payload = {}
+    if is_ajax(request=request) and request.method == "POST":
+        profile_slug = request.POST.get('profile_slug')
+        receiver = UserProfile.objects.get(profile_slug=profile_slug).user
+        try:
+            link = ForgeLink.objects.get(
+                sender=request.user, receiver=receiver, is_active=True)
+            if link:
+                link.is_active = False
+                link.save()
+                payload["success"] = True
+        except ForgeLink.DoesNotExist:
+            payload["error"] = "Sorry! Impossible to cancel this request now. Try later!!!"
+    return JsonResponse(payload)
+
+
+@login_required
+def deleteForgeLink(request):
+    payload = {}
+    if is_ajax(request=request) and request.method == "POST":
+        profile_slug = request.POST.get('profile_slug')
+        try:
+            link = ForgetLink.objects.get(
+                sender=profile.user, receiver=request.user)
+            if link:
+                link.decline()
+                link.save()
+                payload["success"] = True
+        except ForgeLink.DoesNotExist:
+            payload["error"] = "Sorry! Impossible to delete this request now. Try later!!!"
+
+
+@login_required
+def acceptForgeLink(request):
+    payload = {}
+    if is_ajax(request=request) and request.method == "POST":
+        request_id = request.POST.get("request_id")
+        try:
+            link = ForgeLink.objects.get(pk=request_id)
+            link.accept()
+            payload["success"] = True
+            payload["sender"] = link.sender.username
+        except ForgeLink.DoesNotExist:
+            payload["error"] = "Cannot accept this request now. Please Try later !!"
+        return JsonResponse(payload)
+
+
+@login_required
+def Unlink(request):
+    payload = {}
+    user = request.user
+    if is_ajax(request=request) and request.method == 'POST':
+        removee_id = request.POST.get("removee_id")
+        # need to check if the removee is inside of the list of connections
+        # first before making the remove action. User the areLinked method
+        removee = User.objects.get(pk=removee_id)
+        try:
+            link = ConnectionsList.objects.get(user=user)
+            if link.areLinked(removee):  # just a simple check
+                link.unLink(removee)
+                payload["success"] = True
+            else:
+                payload["error"] = f"You can only remove a user within your connections"
+        except ConnectionsList.DoesNotExist:
+            payload["error"] = f"Cannot unlink {removee.username} now. Please try later!"
     return JsonResponse(payload)

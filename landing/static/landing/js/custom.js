@@ -130,7 +130,7 @@ $(document).ready(function () {
         })
     })
 
-
+    // ################ Events listeners here ###################
     $(".posts-section").on("click", (e) => {
         if (!(e.target.href) && !(e.target.name)) return;
         if (e.target.href) {
@@ -250,9 +250,17 @@ $(document).ready(function () {
                 CropImage(imageString, cropX, cropY, cropWidth, cropHeight, max_size)
             }
         })
+    });
+
+    $("#forge_link_status").on("click", (e) => {
+        if ($(e.target).attr('id') === "ForgeNewLink") return ForgeNewLink(e);
+        if ($(e.target).attr('id') === "CancelLinkForge") return cancelForgeLink(e);
+        if ($(e.target).attr('id') === "AcceptLinkForge") return acceptLinkForge(e);
+        if ($(e.target).attr('id') === "DeclineLinkForge") return declineLinkForge(e);
     })
 
 
+    // #################### function sections here ################
 
     function setImageProperties(image, x, y, width, height) {
         imageString = image;
@@ -296,6 +304,7 @@ $(document).ready(function () {
                 success: function (data) {
                     if (data.success) {
                         console.log("there is a success");
+                        // need to come back here later to do
                         // window.location.reload();
                     } else {
                         alert(data.error)
@@ -423,7 +432,6 @@ $(document).ready(function () {
                 </ul >
                 `
                     var commentsContainer = $(`.post-comment-${post_slug}`)
-                    console.log(commentsContainer.children().length)
                     if (commentsContainer.children().length === 1) {
                         var comment_section = document.createElement("div");
                         $(comment_section).attr("class", "comment-section");
@@ -518,10 +526,7 @@ $(document).ready(function () {
                 console.log(data.is_liked)
                 var _icon = e.target.firstElementChild
                 var likes_count = $(e.target).find(".likes-count").text()
-                if (data.is_liked === "Not accepted") {
-                    alert("Sorry! You cannot like your own post!")
-                }
-                else if (data.is_liked) {
+                if (data.is_liked) {
                     $(e.target).find(".likes-count").text(parseInt(likes_count) - 1)
                     $(_icon).removeClass("is-liked").removeClass("fa").addClass("far")
                 } else {
@@ -535,5 +540,72 @@ $(document).ready(function () {
         })
 
     }
+    function cancelForgeLink(e) {
+        console.log($(e.target).attr("id"));
+        var profile_slug = (window.location.pathname).split("/").at(-2)
+        data = { "profile_slug": profile_slug, "csrfmiddlewaretoken": csrftoken, }
+        $.ajax({
+            url: "/connection/cancel-forge-link/",
+            data: data,
+            type: "post",
+            dataType: "json",
+            success: (data) => {
+                console.log(data)
+                if (data.success) {
+                    console.log("ok");
+                    alertUser("Your request to forge a link", "has been cancelled successfully!")
+                    $(e.target).attr("id", "ForgeNewLink")
+                    $(e.target).text("Forge a Link")
+                } else {
+                    alert(data.error)
+                }
+            },
+            error: (error) => {
+                console.log("there was an error");
+            }
+        })
+    }
+    function ForgeNewLink(e) {
+        var profile_slug = (window.location.pathname).split("/").at(-2)
+        data = { "profile_slug": profile_slug, "csrfmiddlewaretoken": csrftoken, }
+        $.ajax({
+            url: "/connection/sending-link-forge/",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: function (data) {
+                if (data.error) {
+                    alert(data.error)
+                } else {
+                    $(e.target).attr("id", "CancelLinkForge");
+                    $(e.target).text("Cancel Forge Link")
+                    alertUser(`Your Request to forge a link has been sent successfully to`, `${data.profile_owner}`)
+                }
 
+            },
+            error: function (error) {
+
+            }
+        })
+    }
+
+    function acceptLinkForge(e) {
+        var request_id = $(e.target).attr("data-request-id")
+        data = { "request_id": request_id, "csrfmiddlewaretoken": csrftoken, }
+        $.ajax({
+            url: "/connection/accept-forge-link/",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: (data) => {
+                if (data.success) {
+                    alertUser("You and ", `${data.sender} are now Linked`)
+                    //update the connection btn
+                    $("#requestAcc_or_dec").fadeOut();
+                } else {
+                    alert(data.error)
+                }
+            }
+        })
+    }
 });

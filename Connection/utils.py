@@ -2,12 +2,19 @@ from django.core.files import File
 from django.core.files.storage import FileSystemStorage, default_storage
 import os
 import base64
+from enum import Enum
 from django.conf import settings
 from .models import ForgeLink
 
 
 def is_ajax(request):  # need to move this function into function for DRY
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
+
+class connectionRequestStatus(Enum):
+    NO_CON_REQUEST = 0
+    YOU_SENT_CON_REQUEST = 1
+    THEY_SENT_CON_REQUEST = 2
 
 
 def get_forge_link_or_false(sender, receiver):

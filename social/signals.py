@@ -37,10 +37,10 @@ def post_unique_slug(sender, instance, *args, **kwargs):
 
 
 @receiver(pre_save, sender=Comment)
-def post_unique_slug(sender, instance, *args, **kwargs):
+def comment_unique_slug(sender, instance, *args, **kwargs):
     if not instance.comment_slug:
         instance.comment_slug = "".join([random.choice(string.ascii_lowercase +
-                                        string.ascii_uppercase + string.digits) for n in range(10)]) + str(instance.id)
+                                        string.ascii_uppercase + string.digits) for n in range(10)]) + str(instance.pk)
 
 
 @receiver(post_save, sender=User)

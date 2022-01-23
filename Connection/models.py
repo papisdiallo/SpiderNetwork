@@ -15,11 +15,11 @@ class ConnectionsList(models.Model):
 
     def addLink(self, new_link):  # adding someone to your connection list
         if not new_link in self.connections.all():
-            self.connections.add(link)
+            self.connections.add(new_link)
 
     def removeLink(self, old_link):  # removing someone to yuur connection list
         if old_link in self.connections.all():
-            self.connections.remove(link)
+            self.connections.remove(old_link)
 
     def unlink(self, removee):  # Breaking a connection between you and someone else
         linkBreaker = self  # user who is terminated the connection
@@ -48,8 +48,8 @@ class ForgeLink(models.Model):
     # in case the user wants to forge a link and sends the request again
 
     def accept(self):  # agree to forge a link with the sender
-        sender_links_list = ConnectionsList.objects.get(user=sender)
-        receiver_links_list = ConnectionsList.objects.get(user=receiver)
+        sender_links_list = ConnectionsList.objects.get(user=self.sender)
+        receiver_links_list = ConnectionsList.objects.get(user=self.receiver)
         if sender_links_list:  # which should exist since we create one for any new user
             sender_links_list.addLink(self.receiver)
             if receiver_links_list:  # Again should exists

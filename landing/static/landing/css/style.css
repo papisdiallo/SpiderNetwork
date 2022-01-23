@@ -3236,6 +3236,18 @@ footer {
   justify-content: center;
   line-height: 22px;
 }
+.con_sect {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+.con_sect button {
+  font-weight: 600;
+  letter-spacing: .02rem;
+  font-size: 18px;
+  margin-right: 10px;
+}
 .social_links li a {
   float: left;
   width: 100%;
@@ -4139,6 +4151,24 @@ a:hover {
   font-weight: 600;
   background-color: #fff;
   padding: 10px 15px;
+  border: 1px solid #dfdfdf;
+}
+.profile-intro {
+  float: left;
+  width: 100%;
+  color: #682747;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  background: #f2f2f2;
+  padding: 8px 20px;
+  border-radius: 5px;
+  font-weight: 500;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .companies-list {
@@ -6147,10 +6177,32 @@ a:hover {
   position: absolute;
   left: 0;
 }
+#requestAcc_or_dec {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px;
+  background: #cfcfcf;
+  border-radius: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+#requestAcc_or_dec button {
+  border: none;
+  outline: none;
+}
+#requestAcc_or_dec button:focus {
+  border: none;
+  outline: none;
+}
 .deatile h3 {
   font-size: 14px;
   font-weight: bold;
   padding-bottom: 5px;
+}
+.cm_img img {
+  width: 43px;
+  border-radius: 50%;
 }
 .clrbtn a {
   background-color: #34011aed;

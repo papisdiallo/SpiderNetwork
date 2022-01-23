@@ -12,149 +12,97 @@
   </section>
   {% endblock sectionCover %}
    {% block rightContent %}
-  <div class="main-left-sidebar">
-    <div class="user_profile" id="user_profile">
-      <div class="user-pro-img position-relative">
-        <img src="{{profile.avatar.url}}" alt="" />
-        <span class="profile-image-camera">
-          <a name="avatar" href="#UserProfileModal" data-bs-toggle="modal" style="color: #000;">
-            <i class="fa fa-camera" aria-hidden="true" style="pointer-events: none;"></i>
-          </a>
-        </span>
+    <div class="main-left-sidebar">
+      <div class="user_profile" id="user_profile">
+        <div class="user-pro-img position-relative">
+          <img src="{{profile.avatar.url}}" alt="" />
+          {% if is_profile_owner %}
+          <span class="profile-image-camera">
+            <a name="avatar" href="#UserProfileModal" data-bs-toggle="modal" style="color: #000;">
+              <i class="fa fa-camera" aria-hidden="true" style="pointer-events: none;"></i>
+            </a>
+          </span>
+          {% endif %}
+        </div>
+        <div class="user_pro_status">
+          <ul class="flw-hr">
+            <li>
+              <a href="#" title="" class="flww"
+                ><i class="fa fa-plus"></i> Follow</a
+              >
+            </li>
+          </ul>
+          <ul class="flw-status">
+            <li>
+              <span>Following</span>
+              <b>34</b>
+            </li>
+            <li>
+              <span>Followers</span>
+              <b>155</b>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="user_pro_status">
-        <ul class="flw-hr">
-          <li>
-            <a href="#" title="" class="flww"
-              ><i class="fa fa-plus"></i> Follow</a
-            >
-          </li>
-        </ul>
-        <ul class="flw-status">
-          <li>
-            <span>Following</span>
-            <b>34</b>
-          </li>
-          <li>
-            <span>Followers</span>
-            <b>155</b>
-          </li>
-        </ul>
-      </div>
-      <ul class="social_links" id="prof-sections">
-        <li>
-          <span class="bio">
-            {% if not is_profile_owner %} <i class="fa fa-address-book mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
-            {% if profile.bio %} {{profile.bio}} {% endif %}
-          </span>
-          {% if is_profile_owner %}  
-          <a data-bs-toggle="modal" href="#UserProfileModal" name="bio" title="">
-            <i class="fa fa-address-book"></i>
-            {% if profile.bio %} Edit {% else %} Add {% endif %} Bio
-          </a>
-          {% endif %}
-        </li>
-        <li>
-          <span class="full_name">
-            {% if not is_profile_owner %} <i class="fa fa-user mr-2" style="margin-top:-1px;font-size: 21px;"></i> {% endif %}
-            {% if profile.full_name %} {{profile.full_name}}{% endif %}
-          </span>
-          {% if is_profile_owner %}  
-          <a data-bs-toggle="modal" href="#UserProfileModal" name="full_name" title="">
-            <i class="fa fa-user"></i>
-            {% if profile.full_name %} Edit {% else %} Add {% endif %} Your full name
-          </a>
-          {% endif %}
-        </li>
-        <li>
-          <span class="location">
-            {% if not is_profile_owner %} <i class="fa fa-map-marker-alt mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}
-            {% if profile.location %} {{profile.location}} {% endif %}
-          </span>
-          {% if is_profile_owner %}  
-          <a data-bs-toggle="modal" href="#UserProfileModal" name="location" title="">
-            <i class="fa fa-map-marker-alt"></i>
-            {% if profile.location %} Edit {% else %} Add {% endif %} Your Location
-          </a>
-          {% endif %}
-        </li>
-        <li>
-          <span class="birth_date">
-            {% if not is_profile_owner %} <i class="fa fa-calendar-plus-o mr-2" style="margin-top: -1px;font-size: 21px;" aria-hidden="true"></i> {% endif %}
-            {% if profile.birth_date %} {{profile.birth_date }} {% endif %}
-          </span>
-          {% if is_profile_owner %}  
-          <a data-bs-toggle="modal" href="#UserProfileModal" name="birth_date" title="">
-            <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-            {% if profile.birth_date %} Edit {% else %} Add {% endif %} Birth date
+      <div class="suggestions full-width">
+        <div class="sd-title">
+          <h3>Suggestions</h3>
+          <i class="fa fa-ellipsis-v"></i>
+        </div>
+        <div class="suggestions-list">
+          <div class="suggestion-usd">
+            <span class="bio">
+              {% if not is_profile_owner %} <i class="fa fa-address-book mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
+              {% if profile.bio %} {{profile.bio}} {% endif %}
+            </span>
+            {% if is_profile_owner %}  
+            <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="bio" title="">
+              <i class="fa fa-address-book mr-2"></i>
+              {% if profile.bio %} Edit {% else %} Add {% endif %} Bio
             </a>
             {% endif %}
-        </li>
-
-      </ul>
-    </div>
-    <div class="suggestions full-width">
-      <div class="sd-title">
-        <h3>Suggestions</h3>
-        <i class="fa fa-ellipsis-v"></i>
-      </div>
-      <div class="suggestions-list">
-        <div class="suggestion-usd">
-          <img src="images/resources/s1.png" alt="" />
-          <div class="sgt-text">
-            <h4>Jessica William</h4>
-            <span>Graphic Designer</span>
           </div>
-          <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-          <img src="images/resources/s2.png" alt="" />
-          <div class="sgt-text">
-            <h4>John Doe</h4>
-            <span>PHP Developer</span>
+          <div class="suggestion-usd">
+            <span class="full_name">
+              {% if not is_profile_owner %} <i class="fa fa-user mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
+              {% if profile.full_name %} {{profile.full_name}} {% endif %}
+            </span>
+            {% if is_profile_owner %}  
+            <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="full_name" title="">
+              <i class="fa fa-user mr-2"></i>
+              {% if profile.full_name %} Edit {% else %} Add {% endif %}Full name
+            </a>
+            {% endif %}
           </div>
-          <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-          <img src="images/resources/s3.png" alt="" />
-          <div class="sgt-text">
-            <h4>Poonam</h4>
-            <span>Wordpress Developer</span>
+          <div class="suggestion-usd">
+            <span class="location">
+              {% if not is_profile_owner %} <i class="fa fa-map-marker-alt mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
+              {% if profile.location %} {{profile.location}} {% endif %}
+            </span>
+            {% if is_profile_owner %}  
+            <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="location" title="">
+              <i class="fa fa-map-marker-alt mr-2"></i>
+              {% if profile.location %} Edit {% else %} Add {% endif %} Location
+            </a>
+            {% endif %}
           </div>
-          <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-          <img src="images/resources/s4.png" alt="" />
-          <div class="sgt-text">
-            <h4>Bill Gates</h4>
-            <span>C & C++ Developer</span>
+          <div class="suggestion-usd">
+            <span class="bio">
+              {% if not is_profile_owner %} <i class="fa fa-birthday-cake mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
+              {% if profile.bio %} {{profile.bio}} {% endif %}
+            </span>
+            {% if is_profile_owner %}  
+            <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="birth-date" title="">
+              <i class="fa fa-birthday-cake mr-2"></i>
+              {% if profile.bio %} Edit {% else %} Add {% endif %} Bio
+            </a>
+            {% endif %}
           </div>
-          <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-          <img src="images/resources/s5.png" alt="" />
-          <div class="sgt-text">
-            <h4>Jessica William</h4>
-            <span>Graphic Designer</span>
-          </div>
-          <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-          <img src="images/resources/s6.png" alt="" />
-          <div class="sgt-text">
-            <h4>John Doe</h4>
-            <span>PHP Developer</span>
-          </div>
-          <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="view-more">
-          <a href="#" title="">View More</a>
         </div>
       </div>
     </div>
-  </div>
 
-  {% endblock rightContent %} 
+    {% endblock rightContent %} 
   {% block content %}
   <div class="main-ws-sec">
     <!-- User Profile modal -->
@@ -208,23 +156,39 @@
           <li><i class="fa fa-star-half-o"></i></li>
         </ul>
       </div>
-      <div
-        class="post-topbar d-flex align-items-center justify-content-between"
-        style="border-top: 3px solid #ccc"
-      >
-        <div class="connection-section">
-          <h3>Biography</h3>
-        </div>
+      <div class="post-topbar d-flex align-items-center flex-column justify-content-between" style="border-top: 3px solid #ccc">
         <div class="post-st con_sect">
-          <button name="" id="" class="btn btn-primary" >
-            Connections
+          <button name="" id="" class="btn btn-outline-primary" >
+            <a href="{% url 'all-connection-view' profile_slug=profile.profile_slug %}"> Connections</a>
             <span>{{connections|length}}</span>
           </button>
-          <button name="" id="" class="btn btn-dark" >
-            Connection Request <span>{{con_request|length}}</span>
-            <span></span>
-          </button>
+          {% if is_profile_owner %}
+            <button name="" id="" class="btn btn-outline-dark">
+              <a href="{% url 'all-connection-view' profile_slug=profile.profile_slug %}"> Connection</a> Request 
+              <span>{{con_request|length}}</span>
+            </button>
+          {% endif %}
+          <div id="forge_link_status">
+            {% if ForgeLinkStatus == 0 %}
+              <button id="ForgeNewLink" class="btn btn-outline-dark" >Connect</button>
+            {% elif ForgeLinkStatus == 1 %}
+              <button id="CancelLinkForge" class="btn btn-outline-dark" >Cancel Connection Request</button>
+            
+            {% endif %}
+          </div>
+          
         </div>
+        {% if ForgeLinkStatus == 2 %}
+              <div id="requestAcc_or_dec">
+                  <div class="req_sender">
+                    <p>{{req_sender}} sent you a connection request</p>
+                  </div>
+                  <div>
+                    <button data-request-id="{{forgeLink_id}}" id="AcceptLinkForge" class="btn btn-outline-success" >Accept</button>
+                    <button data-request-id="{{forgeLink_id}}" id="DeclineLinkForge" class="btn btn-outline-dark" >Delete</button>
+                  </div>
+              </div>
+          {% endif %}
       </div>
     </div>
     <div class="product-feed-tab current" id="feed-dd">
@@ -324,12 +288,10 @@
                                                 </div>
                                                 <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
                                                 <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> {{comment.date_commented|timesince}}</span>
-                                                {% if request.user != comment.author %}
-                                                    <span name="PostLike"  class="com-action">
-                                                        <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
-                                                        <span class="likes-count" style="display:inline;">{{comment.likes.all.count}}</span>
-                                                    </span>
-                                                {% endif %}
+                                                <button name="PostLike" data-slug="comment_like_{{comment.comment_slug}}" class="com-action com mx-0" style="padding: 1px 7px;">
+                                                    <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
+                                                    <span class="likes-count" style="display:inline;pointer-events:none;">{{comment.likes.all.count}}</span>
+                                                </button>
                                                 <span id="comment_delete_{{comment.comment_slug}}" class="com-action">
                                                     <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
                                                 </span>
@@ -344,12 +306,12 @@
                     {% endfor %}
                     <div class="comment_box">             
                         <div class="cm_img">
-                            <img src="/static/landing/images/bg-img4.png" alt="">
+                            <img src="{{request.user.profile.avatar.url}}" alt="profile-image">
                         </div>
                         <form method="post" data-slug="{{post.post_slug}}">
                             {% csrf_token %}
                             <textarea name="content" placeholder="Comment on this post here..." cols="40" rows="2" required="" id="id_content"></textarea>
-                            <button id="" name="commentpost" >Send</button>
+                            <button id="" name="commentpost" >Comment</button>
                         </form>
                     </div>
                 </div>

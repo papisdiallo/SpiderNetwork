@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import edit
+from django.views.generic import ListView
 from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
@@ -15,7 +16,7 @@ from Connection.models import ForgeLink, ConnectionsList
 from django.core import serializers
 import json
 from django.template.loader import render_to_string
-from Connection.utils import get_forge_link_or_false
+from Connection.utils import get_forge_link_or_false, connectionRequestStatus
 
 
 def is_ajax(request):
@@ -132,10 +133,11 @@ class UserProfileView(LoginRequiredMixin, View):
         posts = Post.objects.filter(author__profile__profile_slug=user_slug)
         # We have different states depending on who is looking to the profile and the
         # relationship that they do have with the owner of the profile
-        ForgetLinkStatus = None  # by default
+        ForgeLinkStatus = None  # by default
+        request_sender = None
         forgeLink_id = None
         connections = None
-        con_request = ForgetLink.objects.get(receiver=profile.user)
+        con_request = ForgeLink.objects.filter(receiver=profile.user)
         is_profile_owner = True  # by default
         are_connected = False  # by default
         if profile.user == current_user:
@@ -149,28 +151,30 @@ class UserProfileView(LoginRequiredMixin, View):
             if current_user in connections:  # CASE 2
                 are_connected = True  # means they are connected
             else:
-                are_connected = False
+                are_connected = False  # they are not connected at all
                 if get_forge_link_or_false(sender=profile.user, receiver=current_user) != False:
                     # means they sent you a forge link CASE 3
-                    ForgeLinkStatus = 2
-                    forgeLink_id = get_forget_link_or_false(
+                    ForgeLinkStatus = connectionRequestStatus.THEY_SENT_CON_REQUEST.value
+                    forgeLink_id = get_forge_link_or_false(
                         sender=profile.user, receiver=current_user).id
+                    request_sender = profile.user.username
                 elif get_forge_link_or_false(sender=current_user, receiver=profile.user) != False:
                     # means you sent them a forge link CASE 4
-                    ForgeLinkStatus = 1
-                    forgeLink_id = get_forget_link_or_false(
+                    ForgeLinkStatus = connectionRequestStatus.YOU_SENT_CON_REQUEST.value
+                    forgeLink_id = get_forge_link_or_false(
                         sender=current_user, receiver=profile.user).id
                 else:  # means none of you sent the other a forget link CASE 5
-                    ForgeLinkStatus = 0
+                    ForgeLinkStatus = connectionRequestStatus.NO_CON_REQUEST.value
 
         context = {
             "profile": profile, "posts": posts,
             "form": form, "no_padding": noPadding,
             "is_profile_owner": is_profile_owner,
             "forgeLink_id": forgeLink_id,
-            "ForgeLinkStatus": ForgetLinkStatus,
             "connections": connections,
             "con_request": con_request,
+            "ForgeLinkStatus": ForgeLinkStatus,
+            "req_sender": request_sender,
         }
         return render(request, "landing/profile.html", context)
 
@@ -187,7 +191,7 @@ class CreateCommentPostView(View):
             comment_post = form.save(commit=False)
             comment_post.author = request.user
             comment_post.post = post
-            # comment_post.save()
+            comment_post.save()
             jsonInstance = serializers.serialize(
                 "json",
                 [
@@ -242,6 +246,17 @@ class AddRemovePostLikes(View):
                 else:
                     post.likes.remove(request.user)
                     post.save()
-            if request.user == post.author:
-                return JsonResponse({"is_liked": "Not accepted"})
             return JsonResponse({"is_liked": is_liked})
+
+
+class ConnectionsListView(View):
+    def get(self, request, profile_slug, *arg, **kwargs):
+        user = UserProfile.objects.get(profile_slug=profile_slug).user
+        con_list = ConnectionsList.objects.get(user=user)
+        connections = con_list.connections.all()  # get all the conn of the user
+        con_request = ForgeLink.objects.filter(receiver=user, is_active=True)
+        context = {
+            "connections": connections,
+            "con_request": con_request,
+        }
+        return render(request, "connection/connectionslist.html", context)

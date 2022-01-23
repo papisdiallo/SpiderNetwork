@@ -19,6 +19,7 @@ def create_second_div_once(index):
 @register.filter(name="age")
 def age(value):
     now = datetime.now()
+    print(now)
     try:
         difference = now - value
         print("this is the difference", difference)
