@@ -55,10 +55,7 @@ class CommentPostForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ("avatar", "bio", "birth_date", "location", "full_name",)
-        widgets = {
-            # "avatar": forms.TextInput(attrs={"onchange": "readImageurl();", "label": ""})
-        }
+        fields = ("avatar", "bio", "work_at", "location", "full_name",)
 
     def __init__(self, *args, disabled_field=True, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)

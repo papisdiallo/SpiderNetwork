@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    {% include 'landing/partials/head.html' %}
+  </head>
+  <body>
+    <div class="wrapper">
+      {% include "landing/partials/header.html" %}
+      <section class="companies-info">
+        <div class="container">
+          <div class="company-title">
+            <h3>All Results</h3>
+          </div>
+          <div class="companies-list mb-1">
+            <div class="row">
+              {% for user in found_users_list %}
+              <div class="col-lg-3 col-md-4 col-sm-6 col-12" id="col_parent_{{user.id}}">
+                <div class="company_profile_info">
+                  <div class="company-up-info">
+                    <img src="{{user.0.profile.avatar.url}}" alt="" />
+                    <h3>{% if not user.profile.full_name %}{{user.0.username}} {% else %}{{user.profile.full_name}} {% endif %}</h3>
+                    <h4>Graphic Designer</h4>
+                    <ul>
+                      <li>
+                          {% if user.1 %}
+                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button" data-role="AcceptForgeLink">
+                          Message
+                        </a>
+                        {% elif not user.1 and user.0 != request.user %}
+                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button" data-role="AcceptForgeLink">
+                            Connect
+                        </a>
+                        {% endif %}
+                        {% if user.0 == request.user %}
+                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button" data-role="AcceptForgeLink">
+                            That's you 
+                        </a>
+                        {% endif %}
+                      </li>
+                      <li>
+                        <a class="btn btn-outline-dark hire-us" data-request-id="{{user.0.id}}" role="button" data-role="DeleteForgeLink">
+                            connections
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <a href="{% url 'profile-list-view' user_slug=user.0.profile.profile_slug %}" title=""  class="view-more-pro" >View Profile</a>
+                </div>
+              </div>
+              {% empty %}
+              <div class="row flex-column align-items-center m-auto ">
+                <h1 style="font-size: 30px; font-weight: 500; margin-bottom: 20px;">Sorry, but no result were found for your search</h1>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          
+          <div class="process-comm">
+            <div class="spinner">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {% include 'landing/partials/footer.html' %}
+    </div>
+    {% include 'landing/partials/scripts.html' %}
+  </body>
+</html>

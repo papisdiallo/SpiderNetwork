@@ -15,15 +15,23 @@
           <div class="companies-list mb-1">
             <div class="row">
               {% for connection in con_request %}
-              <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+              <div class="col-lg-3 col-md-4 col-sm-6 col-12" id="col_parent_{{connection.id}}">
                 <div class="company_profile_info">
                   <div class="company-up-info">
                     <img src="{{connection.sender.profile.avatar.url}}" alt="" />
                     <h3>{{connection.sender.username}}</h3>
                     <h4>Graphic Designer</h4>
                     <ul>
-                      <li><a href="#" title="" class="follow">Accept</a></li>
-                      <li><a href="#" title="" class="hire-us">Delete</a></li>
+                      <li>
+                        <a class="btn btn-outline-success follow" data-request-id="{{connection.id}}" role="button" data-role="AcceptForgeLink">
+                          Accept
+                        </a>
+                      </li>
+                      <li>
+                        <a class="btn btn-outline-dark hire-us" data-request-id="{{connection.id}}" role="button" data-role="DeleteForgeLink">
+                          Delete
+                        </a>
+                      </li>
                     </ul>
                   </div>
                   <a href="{% url 'profile-list-view' user_slug=connection.sender.profile.profile_slug %}" title=""  class="view-more-pro" >View Profile</a>
@@ -45,11 +53,11 @@
               <div class="col-lg-3 col-md-4 col-sm-6 col-12">
                 <div class="company_profile_info">
                   <div class="company-up-info">
-                    <img src="{{connection.user.profile.avatar.url}}" alt="" />
+                    <img src="{{connection.profile.avatar.url}}" alt="" />
                     <h3>{{connection.user.username}}</h3>
                     <h4>Graphic Designer</h4>
                     <ul>
-                      <li><a href="#" title="" class="follow">Accept</a></li>
+                      <li><a href="#" title="" class="follow">Disconnect</a></li>
                       <li>
                         <a href="#" title="" class="message-us"
                           ><i class="fa fa-trash-o"></i
@@ -59,7 +67,7 @@
                     </ul>
                   </div>
                   <a
-                    href="{% url 'profile-list-view' connection.user.profile.profile_slug %}"
+                    href="{% url 'profile-list-view' user_slug=connection.profile.profile_slug %}"
                     title=""
                     class="view-more-pro"
                     >View Profile</a

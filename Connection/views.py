@@ -53,7 +53,6 @@ def crop_image(request):
     payload = {}
     user = request.user
     if request.method == "POST" and is_ajax(request=request):
-        print("the request is ajax")
         try:
             # getting the image from the ajax
             image = request.POST.get("imageString")
@@ -72,7 +71,6 @@ def crop_image(request):
 
             cropped_image = img[cropY:cropY+cropHeight, cropX:cropX+cropWidth]
             cv2.imwrite(url, cropped_image)
-            user.profile.avatar.delete()
             user.profile.avatar.save(
                 f"{user.id}_profile_image.png", File(open(url, "rb")))
             payload["success"] = True
@@ -138,16 +136,16 @@ def cancelForgeLink(request):
 def deleteForgeLink(request):
     payload = {}
     if is_ajax(request=request) and request.method == "POST":
-        profile_slug = request.POST.get('profile_slug')
+        request_id = request.POST.get('request_id')
         try:
-            link = ForgetLink.objects.get(
-                sender=profile.user, receiver=request.user)
+            link = ForgeLink.objects.get(id=request_id)
             if link:
                 link.decline()
                 link.save()
                 payload["success"] = True
         except ForgeLink.DoesNotExist:
             payload["error"] = "Sorry! Impossible to delete this request now. Try later!!!"
+    return JsonResponse(payload)
 
 
 @login_required
@@ -158,6 +156,7 @@ def acceptForgeLink(request):
         try:
             link = ForgeLink.objects.get(pk=request_id)
             link.accept()
+            link.save()
             payload["success"] = True
             payload["sender"] = link.sender.username
         except ForgeLink.DoesNotExist:

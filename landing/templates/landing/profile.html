@@ -1,8 +1,6 @@
 {% extends 'landing/partials/base.html' %} 
 {% load crispy_forms_tags %} 
 {% load static %}
-{% load crispy_forms_tags %}
-{% load static %}
 {% load createDivOnlyOnce %}
 {% block header %} {% include 'landing/partials/header.html' %}{% endblock header %}
 <div class="wrapper">
@@ -13,11 +11,11 @@
   {% endblock sectionCover %}
    {% block rightContent %}
     <div class="main-left-sidebar">
-      <div class="user_profile" id="user_profile">
+      <div class="user_profile">
         <div class="user-pro-img position-relative">
           <img src="{{profile.avatar.url}}" alt="" />
           {% if is_profile_owner %}
-          <span class="profile-image-camera">
+          <span class="add-dp">
             <a name="avatar" href="#UserProfileModal" data-bs-toggle="modal" style="color: #000;">
               <i class="fa fa-camera" aria-hidden="true" style="pointer-events: none;"></i>
             </a>
@@ -44,21 +42,21 @@
           </ul>
         </div>
       </div>
-      <div class="suggestions full-width">
+      <div class="suggestions full-width" id="user_profile">
         <div class="sd-title">
-          <h3>Suggestions</h3>
+          <h3>Informations</h3>
           <i class="fa fa-ellipsis-v"></i>
         </div>
         <div class="suggestions-list">
           <div class="suggestion-usd">
-            <span class="bio">
+            <span class="work_at">
               {% if not is_profile_owner %} <i class="fa fa-address-book mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
-              {% if profile.bio %} {{profile.bio}} {% endif %}
+              {% if profile.work_at %} {{profile.work_at}} {% endif %}
             </span>
             {% if is_profile_owner %}  
             <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="bio" title="">
               <i class="fa fa-address-book mr-2"></i>
-              {% if profile.bio %} Edit {% else %} Add {% endif %} Bio
+              {% if profile.work_at %} Edit {% else %} Add {% endif %} Bio
             </a>
             {% endif %}
           </div>
@@ -87,14 +85,14 @@
             {% endif %}
           </div>
           <div class="suggestion-usd">
-            <span class="bio">
+            <span class="birth_date">
               {% if not is_profile_owner %} <i class="fa fa-birthday-cake mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
-              {% if profile.bio %} {{profile.bio}} {% endif %}
+              {% if profile.birth_date %} {{profile.birth_date}} {% endif %}
             </span>
             {% if is_profile_owner %}  
             <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="birth-date" title="">
               <i class="fa fa-birthday-cake mr-2"></i>
-              {% if profile.bio %} Edit {% else %} Add {% endif %} Bio
+              {% if profile.birth_date %} Edit {% else %} Add {% endif %} Birth date
             </a>
             {% endif %}
           </div>
@@ -140,8 +138,9 @@
           
       </div>
       </div>
-  </div>
-  <!-- end of user profile modal -->
+    </div>
+    <!-- end of user profile modal -->
+    {% include 'landing/partials/modals.html' %}
     <div class="user-tab-sec">
       <h3>
         {% if profile.full_name %}{{profile.full_name}} {% else %}{{profile.user.username}}{% endif %}
@@ -158,8 +157,8 @@
       </div>
       <div class="post-topbar d-flex align-items-center flex-column justify-content-between" style="border-top: 3px solid #ccc">
         <div class="post-st con_sect">
-          <button name="" id="" class="btn btn-outline-primary" >
-            <a href="{% url 'all-connection-view' profile_slug=profile.profile_slug %}"> Connections</a>
+          <button name=""  class="btn btn-outline-primary" >
+            <a id="all-connections" href="{% url 'all-connection-view' profile_slug=profile.profile_slug %}"> Connections</a>
             <span>{{connections|length}}</span>
           </button>
           {% if is_profile_owner %}
@@ -184,8 +183,8 @@
                     <p>{{req_sender}} sent you a connection request</p>
                   </div>
                   <div>
-                    <button data-request-id="{{forgeLink_id}}" id="AcceptLinkForge" class="btn btn-outline-success" >Accept</button>
-                    <button data-request-id="{{forgeLink_id}}" id="DeclineLinkForge" class="btn btn-outline-dark" >Delete</button>
+                    <button data-request-id="{{forgeLink_id}}" data-role="AcceptForgeLink" class="btn btn-outline-success" >Accept</button>
+                    <button data-request-id="{{forgeLink_id}}" data-role="DeleteForgeLink" class="btn btn-outline-dark" >Delete</button>
                   </div>
               </div>
           {% endif %}
@@ -197,12 +196,15 @@
                 <div class="post-bar">
                     <div class="post_topbar">
 
-                        <div class="usy-dt">
-                            <img src="{{post.author.profile.avatar.url}}" alt="post author">
+                        <div class="usy-dt position-relative">
+                          <a href="{% url 'profile-list-view' user_slug=post.author.profile.profile_slug %}" class="stretched-link">
+                            <img src="{{post.author.profile.avatar.url}}" alt="post author" />
+                        
                             <div class="usy-name">
                                 <h3>{{post.author.username}}</h3>
-                                <span><i class="fa fa-clock-o" aria-hidden="true"></i>{{post.date_posted|age}} ago</span>
+                                <span><i class="fa fa-clock-o mx-1" aria-hidden="true"></i>{{post.date_posted|first_date_letter }}</span>                
                             </div>
+                          </a>
                         </div>
                         <div class="ed-opts">
                             <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
@@ -212,16 +214,6 @@
                                 <li><a href="#DeletePostModal" data-bs-toggle="modal" data-slug="{{post.post_slug}}" title=""> <i class="fas fa-trash-alt mr-2"></i>Delete </a></li>
                             </ul>
                         </div>
-                    </div>
-                    <div class="epi-sec">
-                        <ul class="descp">
-                            <li><img src="images/icon8.png" alt=""><span>Epic Coder</span></li>
-                            <li><img src="images/icon9.png" alt=""><span>India</span></li>
-                        </ul>
-                        <ul class="bk-links">
-                            <li><a href="#" title=""><i class="fa fa-share" aria-hidden="true"></i></a></li>
-                            <li class="follow"><span>Follow</span></li>
-                        </ul>
                     </div>
                     <div class="job_descp">  
                         <p> {{post.content}}<a href="#" title="">view more</a></p>
@@ -261,9 +253,9 @@
                         {% endfor %}
 
                 <div class="job-status-bar d-flex align-items-center justify-content-around py-1">                    
-                    <button class="com" name="PostLike" data-slug="post_like_{{post.post_slug}}">
-                        <i class=" {% if request.user in post.likes.all %} is-liked fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
-                         Like <span class="likes-count">{{post.likes.all.count}}</span>
+                    <button class="com {% if request.user in post.likes.all %} is_liked {% endif %}" name="PostLike" data-slug="post_like_{{post.post_slug}}">
+                        <i class=" {% if request.user in post.likes.all %}fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
+                        Like <span class="likes-count">{{post.likes.all.count}}</span>
                     </button>
                     <button class="com" name="PostComments">
                         <i class="far fa-comment-alt"></i> Comment <span class="{{post.post_slug}}_comments_count">{{post.comments.all.count}}</span>
@@ -287,10 +279,13 @@
                                                     <p>{{comment.content}}</p>
                                                 </div>
                                                 <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
-                                                <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> {{comment.date_commented|timesince}}</span>
-                                                <button name="PostLike" data-slug="comment_like_{{comment.comment_slug}}" class="com-action com mx-0" style="padding: 1px 7px;">
-                                                    <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
-                                                    <span class="likes-count" style="display:inline;pointer-events:none;">{{comment.likes.all.count}}</span>
+                                                <span style="display:inline;" class="com_date">
+                                                  <i class="fa fa-clock ml-1"></i>
+                                                   {{comment.date_commented|first_date_letter}}
+                                                </span>
+                                                <button name="PostLike" data-slug="comment_like_{{comment.comment_slug}}" class="com-action com mx-0  {% if request.user in comment.likes.all %} is_liked {% endif %}" style="padding: 1px 7px;">
+                                                  <i class=" {% if request.user in comment.likes.all %}fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
+                                                  <span class="likes-count" style="display:inline;pointer-events:none;">{{comment.likes.all.count}}</span>
                                                 </button>
                                                 <span id="comment_delete_{{comment.comment_slug}}" class="com-action">
                                                     <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>

@@ -54,6 +54,7 @@ $(document).ready(function () {
                             $(`${_id}`).modal('hide');
                             $(e.target.nextElementSibling).fadeOut()
                             alertUser("Post", "has been created successfully!")// alerting the user 
+                            UpdatePostUI(_id, data.template)
                         }, 1000)
 
                     } else {
@@ -205,9 +206,6 @@ $(document).ready(function () {
                                     reader.readAsDataURL(e.target.files[0]);
                                 }
                             });
-                            $("#UserProfileModal #UserProfileForm").on("click", (e) => {
-
-                            })
                         }
                     } else {
                         alert(data.error)
@@ -235,7 +233,7 @@ $(document).ready(function () {
                             $("#UserProfileModal").modal("hide")
                             $("#UserProfileForm")[0].reset();
                             // Update the UI
-                            var span = $("#prof-sections").find(`span.${data.field_name}`)
+                            var span = $("#user_profile").find(`span.${data.field_name}`)
                             $(span).text(data.new_value)
 
                         }
@@ -255,9 +253,13 @@ $(document).ready(function () {
     $("#forge_link_status").on("click", (e) => {
         if ($(e.target).attr('id') === "ForgeNewLink") return ForgeNewLink(e);
         if ($(e.target).attr('id') === "CancelLinkForge") return cancelForgeLink(e);
-        if ($(e.target).attr('id') === "AcceptLinkForge") return acceptLinkForge(e);
-        if ($(e.target).attr('id') === "DeclineLinkForge") return declineLinkForge(e);
-    })
+    });
+    $("[data-role='AcceptForgeLink']").on("click", (e) => {
+        acceptLinkForge(e);
+    });
+    $("[data-role='DeleteForgeLink']").on("click", (e) => {
+        deleteLinkForge(e);
+    });
 
 
     // #################### function sections here ################
@@ -386,6 +388,7 @@ $(document).ready(function () {
                         $(`#DeletePostModal`).modal('hide');
                         console.log("this post should already deleted")
                         alertUser("Post", "has been deleted successfully");
+                        $(".posts-section").find(`[data-slug=${post_slug}]`).fadeOut();
                     }
                 },
                 error: function (error) {
@@ -408,6 +411,12 @@ $(document).ready(function () {
             success: function (data) {
                 if (data.success) {
                     var comment = JSON.parse(data.comment_obj)
+                    console.log(comment)
+                    var _readable_date = dateFormating(comment[0].fields["date_commented"])
+                    console.log(_readable_date, "this is the readable date")
+                    var date_commented = timeSince(_readable_date)
+                    console.log(typeof (_readable_date), "this is the type of the date")
+                    console.log(date_commented, "this is the date commented")
                     var commentUl = `
                 <ul>
                     <li>
@@ -421,12 +430,15 @@ $(document).ready(function () {
                                     <p>${comment[0].fields["content"]}</p>
                                 </div>
                                 <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
-                                <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> ${comment[0].fields["date_commented"]}</span>
-                                <span id="comment_like_${data.comment_pk}" class="com-action"><i class="far fa-thumbs-up"></i></span>
-                                <span id="comment_delete_${data.comment_pk}" class="com-action">
-                                    <a data-bs-toggle="modal" data-slug="comment_${data.comment_pk}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
+                                <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> ${date_commented}</span>
+                                <button name="PostLike" data-slug="comment_like_${comment[0].fields['comment_slug']}" class="com-action com mx-0" style="padding: 1px 7px;">
+                                    <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
+                                    <span class="likes-count" style="display:inline;pointer-events:none;">0</span>
+                                </button>
+                                <span id="comment_delete_${comment[0].pk}" class="com-action">
+                                    <a data-bs-toggle="modal" data-slug="comment_like_${comment[0].fields['comment_slug']}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
                                 </span>
-                            </div >
+                            </div>
                         </div >           
                     </li >
                 </ul >
@@ -507,6 +519,7 @@ $(document).ready(function () {
     const csrftoken = getCookie('csrftoken');
 
     function PostLike(e) {
+        $(e.target).attr("disabled", true)
         console.log("the post like function ran");
         var post_slug = $(e.target).attr("data-slug").split("_")
         var slug = post_slug.at(-1)
@@ -528,14 +541,17 @@ $(document).ready(function () {
                 var likes_count = $(e.target).find(".likes-count").text()
                 if (data.is_liked) {
                     $(e.target).find(".likes-count").text(parseInt(likes_count) - 1)
-                    $(_icon).removeClass("is-liked").removeClass("fa").addClass("far")
+                    $(_icon).removeClass("fa").addClass("far")
+                    $(_icon).parent().removeClass("is_liked")
                 } else {
                     $(e.target).find(".likes-count").text(parseInt(likes_count) + 1)
-                    $(_icon).removeClass("far").addClass("is-liked").addClass("fa")
+                    $(_icon).removeClass("far").addClass("fa")
+                    $(_icon).parent().addClass("is_liked")
                 }
+                $(e.target).prop("disabled", false)
             },
-            error: function () {
-
+            error: function (error) {
+                console.log("there was this error", error)
             }
         })
 
@@ -566,6 +582,7 @@ $(document).ready(function () {
         })
     }
     function ForgeNewLink(e) {
+        $(e.target).attr("disabled", true)
         var profile_slug = (window.location.pathname).split("/").at(-2)
         data = { "profile_slug": profile_slug, "csrfmiddlewaretoken": csrftoken, }
         $.ajax({
@@ -579,17 +596,19 @@ $(document).ready(function () {
                 } else {
                     $(e.target).attr("id", "CancelLinkForge");
                     $(e.target).text("Cancel Forge Link")
+                    $(e.target).prop("disabled", false)
                     alertUser(`Your Request to forge a link has been sent successfully to`, `${data.profile_owner}`)
                 }
 
             },
             error: function (error) {
-
+                $(e.target).prop("disabled", false)
             }
         })
     }
 
     function acceptLinkForge(e) {
+        $(e.target).attr("disabled", true)
         var request_id = $(e.target).attr("data-request-id")
         data = { "request_id": request_id, "csrfmiddlewaretoken": csrftoken, }
         $.ajax({
@@ -599,13 +618,108 @@ $(document).ready(function () {
             dataType: "json",
             success: (data) => {
                 if (data.success) {
-                    alertUser("You and ", `${data.sender} are now Linked`)
+
                     //update the connection btn
-                    $("#requestAcc_or_dec").fadeOut();
+                    if (($(e.target).parent().parent()).attr("id") === "requestAcc_or_dec") {
+                        console.log("your are in the proifle page ")
+                        $("#requestAcc_or_dec").fadeOut();
+                        var con_numb = $("#all-connections").text()
+                        console.log(con_numb);
+                        $("#all-connections").text(parseInt(con_numb) + 1)
+                    } else {
+                        var _accepted = `<p class="acceptedRequest"> You and ${data.sender} are now connected</p>`
+                        console.log("you are in the connections list page");
+                        var ul_parent = $(e.target).parent().parent()
+                        ul_parent.replaceWith(_accepted);
+                    }
+                    alertUser("You and ", `${data.sender} are now Linked`)
                 } else {
                     alert(data.error)
+                    $(e.target).prop("disabled", false)
                 }
             }
         })
+    };
+    function deleteLinkForge(e) {
+        $(e.target).attr("disabled", true)
+        console.log("the delete function was called")
+        var request_id = $(e.target).attr("data-request-id")
+        data = { "request_id": request_id, "csrfmiddlewaretoken": csrftoken, }
+        $.ajax({
+            url: "/connection/delete-forge-link/",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: (data) => {
+                if (data.success) {
+                    //update the connection btn
+                    if (($(e.target).parent().parent()).attr("id") === "requestAcc_or_dec") {
+                        console.log("your are in the proifle page ")
+                        $("#requestAcc_or_dec").fadeOut();
+                    } else {
+                        console.log("you are in the connections list page");
+                        $(`#col_parent_${request_id}`).fadeOut();
+                    }
+                    alertUser("connection Request deleted", `successfully!`)
+                } else {
+                    alert(data.error);
+                    $(e.target).prop("disabled", false)
+                }
+            }
+        })
+    }
+    function timeSince(date_obj) {
+
+        var seconds = Math.floor((new Date() - new Date(date_obj)) / 1000);
+        console.log(seconds)
+        var interval = seconds / 31536000;
+
+        if (interval > 1) {
+            return Math.floor(interval) + "y ago";
+        }
+        interval = seconds / 2592000;
+        if (interval > 1) {
+            return Math.floor(interval) + "m ago";
+        }
+        interval = seconds / 86400;
+        if (interval > 1) {
+            return Math.floor(interval) + "d ago";
+        }
+        interval = seconds / 3600;
+        if (interval > 1) {
+            return Math.floor(interval) + "h ago";
+        }
+        interval = seconds / 60;
+        if (interval > 1) {
+            return Math.floor(interval) + " minutes ago";
+        }
+        return Math.floor(seconds) + " seconds ago";
+    }
+    // this function will change the formation of the javascript object to a more human readable date
+    function dateFormating(dateObj, hours = false) {
+        var options1 = { "month": 'numeric', "day": 'numeric', "year": 'numeric', }
+        var options2 = { "month": 'short', "day": 'numeric', "year": 'numeric', "hour": 'numeric', "minute": 'numeric', }
+        var dateTimeFormat = Intl.DateTimeFormat('default',);
+
+        if (dateObj === null) {
+            return "None";
+        } else {
+            var myDate = new Date(dateObj.toString());
+            if (hours) {
+                var dateTimeFormat = Intl.DateTimeFormat('default', options2);
+                return dateTimeFormat.format(myDate);
+            } else {
+                var dateTimeFormat = Intl.DateTimeFormat('default', options1);
+                return dateTimeFormat.format(myDate)
+            }
+        }
+    }
+    function UpdatePostUI(_id, data_template) {
+        if (_id === "#CreatePostModal") {
+            console.log("we created a new post")
+            $(".posts-section").prepend(data_template)
+        } else {
+            console.log("we need to update a post")
+        }
     }
 });

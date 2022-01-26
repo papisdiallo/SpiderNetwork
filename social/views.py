@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import edit
 from django.views.generic import ListView
+from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
@@ -16,7 +17,10 @@ from Connection.models import ForgeLink, ConnectionsList
 from django.core import serializers
 import json
 from django.template.loader import render_to_string
+from django.db.models import Q
 from Connection.utils import get_forge_link_or_false, connectionRequestStatus
+
+User = get_user_model()
 
 
 def is_ajax(request):
@@ -44,15 +48,16 @@ class PostListView(LoginRequiredMixin, View):
                 new_img.save()
                 post_obj.images.add(new_img)
             post_obj.save()
-
+            context = {"post": post_obj, }
+            template = render_to_string(
+                "social/new_post.html", context, request=request)
             result['success'] = True
-
+            result['template'] = template
             return JsonResponse(result)
         else:
             result['success'] = False
             csrf_cxt = {}
             csrf_cxt.update(csrf(request))
-            print("the form is not valid")
             formErrors = render_crispy_form(form, context=csrf_cxt)
             result['formErrors'] = formErrors
             return JsonResponse(result)
@@ -65,7 +70,6 @@ class PostDeleteView(View):
     def post(self, request, post_slug, *args, **kwargs):
         post = get_object_or_404(Post, post_slug=post_slug)
         if is_ajax(request=request):
-            print("the request is ajax and the post should be deleted")
             post.delete()
             return JsonResponse({"success": True})
 
@@ -102,11 +106,9 @@ class UpdatePostView(LoginRequiredMixin, View):
             result["success"] = True
             return JsonResponse(result)
         else:
-            print("the form is not valid at all")
             result['success'] = False
             csrf_cxt = {}
             csrf_cxt.update(csrf(request))
-            print("the form is not valid")
             formErrors = render_crispy_form(form, context=csrf_cxt)
             result['formErrors'] = formErrors
             return JsonResponse(result)
@@ -137,12 +139,15 @@ class UserProfileView(LoginRequiredMixin, View):
         request_sender = None
         forgeLink_id = None
         connections = None
-        con_request = ForgeLink.objects.filter(receiver=profile.user)
+        con_request = ForgeLink.objects.filter(
+            receiver=profile.user, is_active=True)
         is_profile_owner = True  # by default
         are_connected = False  # by default
         if profile.user == current_user:
             # CASE 1 user looking to his own profile
             is_profile_owner = True
+            con_list = ConnectionsList.objects.get(user=profile.user)
+            connections = con_list.connections.all()
         else:  # that means the user is looking to another user's profile
             is_profile_owner = False
             # getting all the connectins of the current profile
@@ -165,7 +170,6 @@ class UserProfileView(LoginRequiredMixin, View):
                         sender=current_user, receiver=profile.user).id
                 else:  # means none of you sent the other a forget link CASE 5
                     ForgeLinkStatus = connectionRequestStatus.NO_CON_REQUEST.value
-
         context = {
             "profile": profile, "posts": posts,
             "form": form, "no_padding": noPadding,
@@ -212,7 +216,6 @@ class CreateCommentPostView(View):
 class DeleteCommentPostView(View):
     def post(self, request, comment_id, *args, **kwargs):
         if is_ajax(request=request):
-            print("the request is ajax and this post should be deleted")
             comment = get_object_or_404(Comment, id=comment_id)
             post_slug = comment.post.post_slug
             comment.delete()
@@ -223,7 +226,6 @@ class AddRemovePostLikes(View):
     def post(self, request, post_or_comment_slug, *args, **kwargs):
         if is_ajax(request=request):
             liked_a = request.POST.get("liked_a")
-            print(liked_a)
             is_liked = None
             if liked_a == "comment":
                 comment = get_object_or_404(
@@ -249,7 +251,7 @@ class AddRemovePostLikes(View):
             return JsonResponse({"is_liked": is_liked})
 
 
-class ConnectionsListView(View):
+class ConnectionsListView(LoginRequiredMixin, View):
     def get(self, request, profile_slug, *arg, **kwargs):
         user = UserProfile.objects.get(profile_slug=profile_slug).user
         con_list = ConnectionsList.objects.get(user=user)
@@ -260,3 +262,24 @@ class ConnectionsListView(View):
             "con_request": con_request,
         }
         return render(request, "connection/connectionslist.html", context)
+
+    # def test_func(self, request, *args, **kwargs):
+    #     print(kwargs)
+    #     # to check for later
+    #     return True
+
+
+class searchView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        user_links = ConnectionsList.objects.get(user=user)
+        q = request.GET.get("q")
+        found_users = User.objects.filter(
+            Q(username__icontains=q) | Q(
+                email__icontains=q) | Q(profile__full_name__icontains=q)
+        ).distinct()
+        search_list_result = []
+        for _user in found_users:
+            search_list_result.append((_user, user_links.areLinked(_user)))
+        context = {"found_users_list": search_list_result, }
+        return render(request, "social/search_result.html", context)

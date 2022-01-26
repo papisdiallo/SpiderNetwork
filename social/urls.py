@@ -20,5 +20,5 @@ urlpatterns = [
          s_views.AddRemovePostLikes.as_view(), name="like-post"),
     path("all-connection/<slug:profile_slug>/",
          s_views.ConnectionsListView.as_view(), name="all-connection-view"),
-
+    path("search-list/", s_views.searchView.as_view(), name="search-list")
 ]

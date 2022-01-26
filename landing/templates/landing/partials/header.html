@@ -3,11 +3,11 @@
   <div class="container">
     <div class="header-data">
       <div class="logo">
-        <a href="index.html" title=""><img src="images/logo.png" alt="" /></a>
+        <a href="index.html" title=""><img src="{% static 'landing/images/logo_1.png' %}" alt="" style="width: 38px;" /></a>
       </div>
       <div class="search-bar">
-        <form>
-          <input type="text" name="search" placeholder="Search..." />
+        <form method="get" action={% url 'search-list' %}>
+          <input type="text" name="q" placeholder="Search by name or email..." />
           <button type="submit"><i class="fa fa-search"></i></button>
         </form>
       </div>

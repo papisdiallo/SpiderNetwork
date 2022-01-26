@@ -4,15 +4,6 @@ from django.utils import timezone
 from django.template.defaultfilters import slugify
 
 
-class Tags(models.Model):
-    name = models.CharField(max_length=200)
-    tag_slug = models.SlugField()
-    date_created = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return self.name
-
-
 class Files(models.Model):
     image = models.ImageField(upload_to="post/images")
 
@@ -52,8 +43,8 @@ class UserProfile(models.Model):
     avatar = models.ImageField(
         default="default/default.png", upload_to="users/avatar/")
     full_name = models.CharField(max_length=200, blank=True, null=True)
+    work_at = models.CharField(max_length=200, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
-    birth_date = models.DateTimeField(blank=True, null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
     profile_slug = models.SlugField()
     date_created = models.DateTimeField(default=timezone.now)

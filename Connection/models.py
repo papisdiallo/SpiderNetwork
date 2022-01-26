@@ -30,7 +30,7 @@ class ConnectionsList(models.Model):
         removee_ConnectionsList.removeLink(self.user)
 
     def areLinked(self, link):
-        return True if link in self.connection.all() else False
+        return True if link in self.connections.all() else False
 
 
 class ForgeLink(models.Model):
