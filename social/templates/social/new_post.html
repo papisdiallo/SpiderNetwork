@@ -9,8 +9,7 @@
             
                 <div class="usy-name">
                     <h3>{{post.author.username}}</h3>
-                    <span><i class="fa fa-clock-o mx-1" aria-hidden="true"></i>{{post.date_posted|first_date_letter }} ago</span>
-                    
+                    <span><i class="fa fa-clock-o mx-1" aria-hidden="true"></i>{{post.date_posted|first_date_letter }}</span>
                 </div>
             </a>
         </div>
@@ -59,7 +58,7 @@
             {% endif %}
         {% endfor %}
 
-        <div class="job-status-bar d-flex align-items-center justify-content-around py-1">                    
+        <div class="mb-3 job-status-bar d-flex align-items-center justify-content-around py-1">                    
             <button class="com {% if request.user in post.likes.all %} is_liked {% endif %}" name="PostLike" data-slug="post_like_{{post.post_slug}}">
                 <i class=" {% if request.user in post.likes.all %}fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
                 Like <span class="likes-count">{{post.likes.all.count}}</span>

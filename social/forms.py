@@ -27,13 +27,42 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ("content",)
+        fields = ["content"]
         widgets = {
             "content": forms.Textarea(attrs={"placeholder": "Tell us something today....", "rows": 5, "label": ""})
         }
 
     def __init__(self, *args, disabled_field=True, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
+        # self.fields["images"].widget = HiddenInput()
+        self.helper = FormHelper()
+        self.helper.form_id = "createPostForm"
+        self.fields["content"].label = ""
+        self.fields["images"].label = ""
+        self.helper.layout = Layout(
+            Field("content"),
+            Field("images"),
+            # Submit("post-create", "Post")
+        )
+
+
+class UpdatePostForm(forms.ModelForm):
+    images = forms.ImageField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={
+            'multiple': True,
+        })
+    )
+
+    class Meta:
+        model = Post
+        fields = ["content", "images"]
+        widgets = {
+            "content": forms.Textarea(attrs={"placeholder": "Tell us something today....", "rows": 5, "label": ""})
+        }
+
+    def __init__(self, *args, disabled_field=True, **kwargs):
+        super(UpdatePostForm, self).__init__(*args, **kwargs)
         # self.fields["images"].widget = HiddenInput()
         self.helper = FormHelper()
         self.helper.form_id = "createPostForm"
@@ -56,6 +85,9 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ("avatar", "bio", "work_at", "location", "full_name",)
+        widgets = {
+            "bio": forms.Textarea(attrs={"placeholder": "Tell us about yourself....", "rows": 4, "label": "Biography:"})
+        }
 
     def __init__(self, *args, disabled_field=True, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)

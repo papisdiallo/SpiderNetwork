@@ -31,7 +31,6 @@ def first_date_letter(value):
     l = result.split(" ")
     l_sec = l[0].split("\xa0")
     l_sec[1] = l_sec[1][:1]  # get only the first letter of the second part
-    print(l_sec)
     l[0] = "".join(l_sec)
     return " ".join(l)
 

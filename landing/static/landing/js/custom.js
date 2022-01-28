@@ -16,13 +16,11 @@ $(document).ready(function () {
     $("#CreatePostModal").on("keyup", (e) => {
         if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") return;
         if (e.target.classList.contains("is-invalid")) {
-
             e.target.classList.remove("is-invalid");
         }
     })
     modalsId.forEach((_id, index) => {
         $(`${_id}`).on("click", (e) => {
-            console.log(e.target.id)
             if ($(e.target).attr("id") !== "createPostBtn") return;
             e.preventDefault();
             $(e.target.nextElementSibling).fadeIn()
@@ -31,11 +29,8 @@ $(document).ready(function () {
             var data = new FormData(form);
 
             for (var i = 0; i < imageFiles.length; i++) { // append the uuploaded images to data
-                console.log(imageFiles[i])
                 data.append('images', imageFiles[i]);
             };
-
-            //make the ajax call here 
 
             $.ajax({
                 url: $(`${_id}`).attr("data-url"),
@@ -47,14 +42,17 @@ $(document).ready(function () {
                 dataType: "json",
                 success: (data) => {
                     if (data.success) {
+                        let message;
                         setTimeout(() => {
                             $(e.target).next().fadeOut();
                             // take care of the reset form for both later
                             ResetForm('createPostForm', 'PreviewImagesContainer')
                             $(`${_id}`).modal('hide');
                             $(e.target.nextElementSibling).fadeOut()
-                            alertUser("Post", "has been created successfully!")// alerting the user 
-                            UpdatePostUI(_id, data.template)
+                            _id === "#UpdatePostModal" ? message = "Post has been updated" :
+                                message = "Post has been created"
+                            alertUser(`${message}`, "successfully!")// alerting the user 
+                            UpdatePostUI(_id, data.template, data.post_slug)
                         }, 1000)
 
                     } else {
@@ -73,8 +71,6 @@ $(document).ready(function () {
         });
 
     })
-
-    // var postImagesInput = document.getElementById("id_images");
 
     modalsId.forEach((_id, index) => {
         $(`${_id}`).on("change", (e) => {
@@ -126,7 +122,7 @@ $(document).ready(function () {
                 $(postImagesPreviewContainer).append(row);
                 reader.readAsDataURL(file)
                 var image_input_div = document.querySelector(`${_id} #createPostForm #div_id_images`);
-                document.querySelector(`${_id} #createPostForm`).insertBefore(postImagesPreviewContainer, image_input_div)
+                document.querySelector(`${_id} #createPostForm`).insertBefore($(postImagesPreviewContainer), image_input_div)
             });
         })
     })
@@ -144,6 +140,44 @@ $(document).ready(function () {
 
         }
     });
+    $(".user_profile").on("click", (e) => {
+        if (e.target.getAttribute("name") === "flww_or_unflww") {
+            var profile_slug = window.location.pathname.split("/").at(-2)
+            var url = `/social/add-remove-follower/${profile_slug}/`
+            $.ajax({
+                url: url,
+                method: "post",
+                dataType: "json",
+                data: {
+                    "csrfmiddlewaretoken": csrftoken,
+                },
+                success: function (data) {
+                    if (data.success) {
+                        let message;
+                        var numb_of_flowing = $(".flw-status .following").text();
+                        console.log(numb_of_flowing)
+                        if (data.flw) {
+                            message = "You are now following";
+                            $(e.target).text("Unfollow");
+                            $(".flw-status .following").text(parseInt(numb_of_flowing) + 1)
+                        } else {
+                            message = "You have been remove from the followers of"
+                            $(e.target).text("Follow")
+                            $(".flw-status .following").text(parseInt(numb_of_flowing) - 1)
+                        }
+                        alertUser(`${message}`, `${data.following}`)
+                        // update the btn and the number of following
+                    } else {
+                        alert(data.error)
+                    }
+                },
+                error: function (e) {
+                    console.log(e)
+                }
+            })
+        }
+    })
+
     $("#user_profile").on("click", (e) => {
         var profile_slug = window.location.pathname.split("/").at(-2)
         var url = `/connection/update-profile/${profile_slug}/`
@@ -356,7 +390,24 @@ $(document).ready(function () {
             dataType: "json",
             success: function (data) {
                 var updateFormLocal = $("#UpdatePostModal .modal-body .container-fluid")
-                updateFormLocal.html(data.template)
+                updateFormLocal.html(data.template);
+                var _dataFiles = new DataTransfer();
+                var images = document.querySelectorAll("#UpdatePostModal .post-images__child img")
+                var image_input = $(updateFormLocal).find("#id_images")[0];
+                images.forEach((img, index) => {
+                    var _ImgName = img.currentSrc.split("/").at(-1)
+                    // the srcToFile function will return a promise
+                    // so we need to call the then method to get the result which is a file
+                    async function insertImagesToFileInput() {
+                        var file = await srcToFile2(img.currentSrc, _ImgName, "image/jpeg")
+                        _dataFiles.items.add(file)
+                        image_input.files = _dataFiles.files
+                    }
+                    insertImagesToFileInput();
+                })
+
+
+
                 var maxFileError = `
                 <div class="maxFileError">
                     <p class="errornote">You cannot upload more than 5 images</p>
@@ -418,7 +469,7 @@ $(document).ready(function () {
                     console.log(typeof (_readable_date), "this is the type of the date")
                     console.log(date_commented, "this is the date commented")
                     var commentUl = `
-                <ul>
+                <ul class="comment_instance_${comment[0].pk}">
                     <li>
                         <div class="comment-list">
                             <div class="bg-img">
@@ -436,7 +487,9 @@ $(document).ready(function () {
                                     <span class="likes-count" style="display:inline;pointer-events:none;">0</span>
                                 </button>
                                 <span id="comment_delete_${comment[0].pk}" class="com-action">
-                                    <a data-bs-toggle="modal" data-slug="comment_like_${comment[0].fields['comment_slug']}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
+                                    <a data-bs-toggle="modal" data-slug="comment_${comment[0].pk}" href="#DeleteCommentPostModal"> 
+                                        <i class="fa fa-trash mx-1"></i>
+                                    </a>                               
                                 </span>
                             </div>
                         </div >           
@@ -473,8 +526,10 @@ $(document).ready(function () {
     function DeleteCommentPost(e) {
         console.log("the delete comment post ran")
         var data_slug = $(e.target).attr("data-slug").split("_").at(-1);
+        console.log(data_slug)
+        console.log(e.target)
         var url = `/social/delete-comment-post/${data_slug}/`
-
+        console.log(url)
         $("#DeleteCommentPostModal").on("click", (ev) => {
             if ($(ev.target).attr("id") !== "deleteCommentPostBtn") return;
             ev.preventDefault();
@@ -488,9 +543,9 @@ $(document).ready(function () {
                     if (data.success) {
                         $(`#DeleteCommentPostModal`).modal('hide');
                         var comments_count = $(`.${data.post_slug}_comments_count`).text()
-                        console.log(comments_count)
                         $(`.${data.post_slug}_comments_count`).text(parseInt(comments_count) - 1)
                         alertUser("Comment", "has been deleted successfully");
+                        $(`.comment_instance_${data_slug}`).fadeOut();
                     }
                 },
                 error: function (error) {
@@ -499,7 +554,6 @@ $(document).ready(function () {
             })
         });
     }
-
     // setting the csrf token config I guess...
     function getCookie(name) {
         let cookieValue = null;
@@ -714,12 +768,23 @@ $(document).ready(function () {
             }
         }
     }
-    function UpdatePostUI(_id, data_template) {
+    function UpdatePostUI(_id, data_template, post_slug) {
         if (_id === "#CreatePostModal") {
-            console.log("we created a new post")
             $(".posts-section").prepend(data_template)
         } else {
-            console.log("we need to update a post")
+            $(`.posts-section [data-slug=${post_slug}]`).replaceWith(data_template);
         }
+    }
+    async function srcToFile(src, fileName, mimeType) {
+        return (fetch(src)
+            .then(function (res) { return res.arrayBuffer(); })
+            .then(function (buf) { return new File([buf], fileName, { type: mimeType }); })
+        );
+    }
+    async function srcToFile2(src, fileName, mimeType) {
+        const res = await fetch(src)
+        const arr = await res.arrayBuffer()
+        return new File([arr], fileName, { type: mimeType });
+
     }
 });

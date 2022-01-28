@@ -90,7 +90,6 @@ class UpdatePostView(LoginRequiredMixin, View):
                         request.FILES or None, instance=post)
         result = {}
         files = request.FILES.getlist("images")
-
         if is_ajax(request=request) and form.is_valid():
 
             post_obj = form.save()
@@ -101,8 +100,11 @@ class UpdatePostView(LoginRequiredMixin, View):
                 img.save()
                 post.images.add(img)
             post_obj.save()
-
-            print("the request is ajax and the form is valid")
+            context = {"post": post_obj, }
+            template = render_to_string(
+                "social/new_post.html", context, request=request)
+            result["post_slug"] = post_obj.post_slug
+            result["template"] = template
             result["success"] = True
             return JsonResponse(result)
         else:
@@ -136,6 +138,7 @@ class UserProfileView(LoginRequiredMixin, View):
         # We have different states depending on who is looking to the profile and the
         # relationship that they do have with the owner of the profile
         ForgeLinkStatus = None  # by default
+        follower = False
         request_sender = None
         forgeLink_id = None
         connections = None
@@ -143,6 +146,8 @@ class UserProfileView(LoginRequiredMixin, View):
             receiver=profile.user, is_active=True)
         is_profile_owner = True  # by default
         are_connected = False  # by default
+        if current_user in profile.following.all():
+            follower = True
         if profile.user == current_user:
             # CASE 1 user looking to his own profile
             is_profile_owner = True
@@ -170,6 +175,7 @@ class UserProfileView(LoginRequiredMixin, View):
                         sender=current_user, receiver=profile.user).id
                 else:  # means none of you sent the other a forget link CASE 5
                     ForgeLinkStatus = connectionRequestStatus.NO_CON_REQUEST.value
+
         context = {
             "profile": profile, "posts": posts,
             "form": form, "no_padding": noPadding,
@@ -179,6 +185,7 @@ class UserProfileView(LoginRequiredMixin, View):
             "con_request": con_request,
             "ForgeLinkStatus": ForgeLinkStatus,
             "req_sender": request_sender,
+            "follower": follower,
         }
         return render(request, "landing/profile.html", context)
 
@@ -249,6 +256,27 @@ class AddRemovePostLikes(View):
                     post.likes.remove(request.user)
                     post.save()
             return JsonResponse({"is_liked": is_liked})
+
+
+class AddRemoveFollowers(LoginRequiredMixin, View):
+    def post(self, request, profile_slug, *args, **kwargs):
+        payload = dict()
+        try:
+            profile = UserProfile.objects.get(profile_slug=profile_slug)
+            followers = profile.followers.all()
+            user = request.user
+            if not user in followers:
+                profile.followers.add(user)
+                payload["is_flw"] = True
+            else:
+                profile.followers.remove(user)
+                payload["is_flw"] = False
+            profile.save()
+            payload["success"] = True
+            payload["following"] = profile.user.username
+        except UserProfile.DoesNotExist:
+            payload['error'] = "An Error happenned .Please Try later!"
+        return JsonResponse(payload)
 
 
 class ConnectionsListView(LoginRequiredMixin, View):

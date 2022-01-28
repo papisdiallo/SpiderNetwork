@@ -2172,6 +2172,20 @@ input#submit-id-editproject {
 .comment_box {
   float: none;
 }
+.flww_btn {
+    color: #ffffff;
+    font-size: 16px;
+    background-color: #34011aed;
+    padding: 12px;
+    font-weight: 500;
+    border: none;
+    outline: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.flww_btn:focus {
+  outline: none;
+}
 .comment_box textarea {
   margin-bottom: 5px;
   border: 1px solid #e5e5e5;

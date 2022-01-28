@@ -46,6 +46,8 @@ class UserProfile(models.Model):
     work_at = models.CharField(max_length=200, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
+    following = models.ManyToManyField(
+        User, related_name="followers", blank=True)
     profile_slug = models.SlugField()
     date_created = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)

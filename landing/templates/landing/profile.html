@@ -25,19 +25,26 @@
         <div class="user_pro_status">
           <ul class="flw-hr">
             <li>
-              <a href="#" title="" class="flww"
-                ><i class="fa fa-plus"></i> Follow</a
-              >
+              
+                {% if not follower %}
+                <button name="flww_or_unflww" title="" class="flww_btn">
+                   Follow
+                </button>
+                {% else %}
+                <button name="flww_or_unflww" title="" class="flww_btn">
+                   Unfollow
+                </button>
+                {% endif %}
             </li>
           </ul>
           <ul class="flw-status">
             <li>
-              <span>Following</span>
-              <b>34</b>
+              <span >Following</span>
+              <b class="following">{{profile.followers.count}}</b>
             </li>
             <li>
-              <span>Followers</span>
-              <b>155</b>
+              <span >Followers</span>
+              <b class="follower">{{profile.following.count}}</b>
             </li>
           </ul>
         </div>
@@ -49,14 +56,14 @@
         </div>
         <div class="suggestions-list">
           <div class="suggestion-usd">
-            <span class="work_at">
+            <span class="bio">
               {% if not is_profile_owner %} <i class="fa fa-address-book mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
-              {% if profile.work_at %} {{profile.work_at}} {% endif %}
+              {% if profile.bio %} {{profile.bio}} {% endif %}
             </span>
             {% if is_profile_owner %}  
             <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="bio" title="">
               <i class="fa fa-address-book mr-2"></i>
-              {% if profile.work_at %} Edit {% else %} Add {% endif %} Bio
+              {% if profile.bio %} Edit {% else %} Add {% endif %} Bio
             </a>
             {% endif %}
           </div>
@@ -85,14 +92,14 @@
             {% endif %}
           </div>
           <div class="suggestion-usd">
-            <span class="birth_date">
-              {% if not is_profile_owner %} <i class="fa fa-birthday-cake mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
-              {% if profile.birth_date %} {{profile.birth_date}} {% endif %}
+            <span class="work_at">
+              {% if not is_profile_owner %} <i class="fa fa-work mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
+              {% if profile.work_at %} {{profile.work_at}} {% endif %}
             </span>
             {% if is_profile_owner %}  
-            <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="birth-date" title="">
-              <i class="fa fa-birthday-cake mr-2"></i>
-              {% if profile.birth_date %} Edit {% else %} Add {% endif %} Birth date
+            <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="work_at" title="">
+              <i class="fa fa-work mr-2"></i>
+              {% if profile.work_at %} Edit {% else %} Add {% endif %} work or study at
             </a>
             {% endif %}
           </div>
@@ -206,14 +213,15 @@
                             </div>
                           </a>
                         </div>
+                        {% if post.author == request.user %}
                         <div class="ed-opts">
                             <a href="#" title="" class="ed-opts-open"><i class="fa fa-ellipsis-v"></i></a>
                             <ul class="ed-options">
                                 <li><a data-bs-toggle="modal" id="{{post.post_slug}}" href="#UpdatePostModal" role="button"><i class="fas fa-edit mr-2"></i> Edit Post</a></li>
-                                <li><a href="#"  title=""><i class="fa fa-eye-slash mr-2"></i>Hide</a></li>
                                 <li><a href="#DeletePostModal" data-bs-toggle="modal" data-slug="{{post.post_slug}}" title=""> <i class="fas fa-trash-alt mr-2"></i>Delete </a></li>
                             </ul>
                         </div>
+                        {% endif %}
                     </div>
                     <div class="job_descp">  
                         <p> {{post.content}}<a href="#" title="">view more</a></p>
@@ -252,7 +260,7 @@
                             {% endif %}
                         {% endfor %}
 
-                <div class="job-status-bar d-flex align-items-center justify-content-around py-1">                    
+                <div class="mb-3 job-status-bar d-flex align-items-center justify-content-around py-1">                    
                     <button class="com {% if request.user in post.likes.all %} is_liked {% endif %}" name="PostLike" data-slug="post_like_{{post.post_slug}}">
                         <i class=" {% if request.user in post.likes.all %}fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
                         Like <span class="likes-count">{{post.likes.all.count}}</span>
@@ -267,7 +275,7 @@
                         {% if forloop.first %}
                          <div class="comment-section">
                             <div class="comment-sec">{% endif %}
-                                <ul>
+                                <ul class="comment_instance_{{comment.id}}">
                                     <li>
                                         <div class="comment-list">
                                             <div class="bg-img">
@@ -287,9 +295,13 @@
                                                   <i class=" {% if request.user in comment.likes.all %}fa {% else %} far {% endif %} fa-thumbs-up" style="pointer-events:none;"></i>
                                                   <span class="likes-count" style="display:inline;pointer-events:none;">{{comment.likes.all.count}}</span>
                                                 </button>
-                                                <span id="comment_delete_{{comment.comment_slug}}" class="com-action">
-                                                    <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> <i class="fa fa-trash mx-1"></i></a>
-                                                </span>
+                                                {% if comment.author == request.user %}
+                                                    <span id="comment_delete_{{comment.id}}" class="com-action">
+                                                        <a data-bs-toggle="modal" data-slug="comment_{{comment.id}}" href="#DeleteCommentPostModal"> 
+                                                          <i class="fa fa-trash mx-1"></i>
+                                                        </a>
+                                                    </span>
+                                                {% endif %}
                                             </div>
                                         </div>           
                                     </li>
