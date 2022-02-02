@@ -8,8 +8,16 @@
     <main>
       <div class="main-section">
         <div class="container">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
           <div class="main-section-data {% if not no_padding %}mt-5{% endif %}">
             <div class="row">
+              
               <div class="col-lg-3 col-md-4 pd-left-none no-pd">
                 {% block rightContent %} {% endblock rightContent %}
               </div>

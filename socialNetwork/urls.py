@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('landing.urls')),
     path('social/', include('social.urls')),
+    path('chat/', include('chat.urls')),
     path('connection/', include('Connection.urls')),
     path('accounts/', include('allauth.urls')),
 

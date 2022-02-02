@@ -23,28 +23,29 @@
           {% endif %}
         </div>
         <div class="user_pro_status">
+          {% if not is_profile_owner %}
           <ul class="flw-hr">
-            <li>
-              
+            <li>             
                 {% if not follower %}
-                <button name="flww_or_unflww" title="" class="flww_btn">
+                <button name="flww" class="flww_btn">
                    Follow
                 </button>
                 {% else %}
-                <button name="flww_or_unflww" title="" class="flww_btn">
+                <button name="unflww" class="flww_btn">
                    Unfollow
                 </button>
                 {% endif %}
             </li>
           </ul>
+          {% endif %}
           <ul class="flw-status">
             <li>
               <span >Following</span>
-              <b class="following">{{profile.followers.count}}</b>
+              <b class="following">{{following}}</b>
             </li>
             <li>
               <span >Followers</span>
-              <b class="follower">{{profile.following.count}}</b>
+              <b class="followers">{{followers}}</b>
             </li>
           </ul>
         </div>
@@ -56,10 +57,10 @@
         </div>
         <div class="suggestions-list">
           <div class="suggestion-usd">
-            <span class="bio">
+            <p class="bio">
               {% if not is_profile_owner %} <i class="fa fa-address-book mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
               {% if profile.bio %} {{profile.bio}} {% endif %}
-            </span>
+          </p>
             {% if is_profile_owner %}  
             <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="bio" title="">
               <i class="fa fa-address-book mr-2"></i>
@@ -68,10 +69,10 @@
             {% endif %}
           </div>
           <div class="suggestion-usd">
-            <span class="full_name">
+            <p class="full_name">
               {% if not is_profile_owner %} <i class="fa fa-user mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
               {% if profile.full_name %} {{profile.full_name}} {% endif %}
-            </span>
+          </p>
             {% if is_profile_owner %}  
             <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="full_name" title="">
               <i class="fa fa-user mr-2"></i>
@@ -80,10 +81,10 @@
             {% endif %}
           </div>
           <div class="suggestion-usd">
-            <span class="location">
+            <p class="location">
               {% if not is_profile_owner %} <i class="fa fa-map-marker-alt mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
               {% if profile.location %} {{profile.location}} {% endif %}
-            </span>
+          </p>
             {% if is_profile_owner %}  
             <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="location" title="">
               <i class="fa fa-map-marker-alt mr-2"></i>
@@ -92,10 +93,10 @@
             {% endif %}
           </div>
           <div class="suggestion-usd">
-            <span class="work_at">
+            <p class="work_at">
               {% if not is_profile_owner %} <i class="fa fa-work mr-2" style="margin-top: -1px;font-size: 21px;"></i> {% endif %}            
               {% if profile.work_at %} {{profile.work_at}} {% endif %}
-            </span>
+          </p>
             {% if is_profile_owner %}  
             <a data-bs-toggle="modal" class="profile-intro" href="#UserProfileModal" name="work_at" title="">
               <i class="fa fa-work mr-2"></i>

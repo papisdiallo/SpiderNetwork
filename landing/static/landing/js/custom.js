@@ -141,44 +141,99 @@ $(document).ready(function () {
         }
     });
     $(".user_profile").on("click", (e) => {
-        if (e.target.getAttribute("name") === "flww_or_unflww") {
-            var profile_slug = window.location.pathname.split("/").at(-2)
-            var url = `/social/add-remove-follower/${profile_slug}/`
+        console.log(e.target.href)
+        if (e.target.href) return editUserProfile(e);
+        if ((e.target.name) && !(e.target.href)) return FollowUnfollowProfile(e);
+
+    })
+
+    $("#user_profile").on("click", (e) => { editUserProfile(e) });
+
+    $("#forge_link_status").on("click", (e) => {
+        if ($(e.target).attr('id') === "ForgeNewLink") return ForgeNewLink(e);
+        if ($(e.target).attr('id') === "CancelLinkForge") return cancelForgeLink(e);
+    });
+    $("[data-role='AcceptForgeLink']").on("click", (e) => {
+        acceptLinkForge(e);
+    });
+    $("[data-role='DeleteForgeLink']").on("click", (e) => {
+        deleteLinkForge(e);
+    });
+
+    $(".companies-list").on('click', (e) => {
+        if (!($(e.target).attr("data-role"))) return;
+        if ($(e.target).attr("data-role") === "ForgeNewLink") return ForgeNewLink(e);
+        if ($(e.target).attr("data-role") === "CancelLinkForge") return cancelForgeLink(e);
+        if ($(e.target).attr("data-role") === "DeleteForgeLink") return deleteLinkForge(e);
+        if ($(e.target).attr("data-role") === "Disconnect") return unLink(e);
+    })
+
+    // #################### function sections here ################
+
+    function setImageProperties(image, x, y, width, height) {
+        imageString = image;
+        cropX = x;
+        cropY = y;
+        cropWidth = width;
+        cropHeight = height;
+    }
+    function CheckImageSize(image, max_upload_size) {
+        console.log("the check image size function run")
+        console.log(image)
+        var startIndex = image.indexOf("base64,") + 7
+        var imageBase64 = image.substring(startIndex)
+        var decodedImg = atob(imageBase64)
+        if (decodedImg >= max_upload_size) {
+            return null;
+        } else {
+            return imageBase64
+        }
+    }
+    // the rolw of this function is to send the image as a string
+    // since ajax cannot send image files
+    function CropImage(image, cropX, cropY, cropWidth, cropHeight, max_upload_size) {
+        console.log(cropX)
+        //fisrt check if the size of the image is not greater than size allowed
+        // in the settings.py file
+        var imageString = CheckImageSize(image, max_upload_size);
+        if (imageString !== null) {
+            var data = {
+                "imageString": imageString,
+                "cropX": cropX,
+                "cropY": cropY,
+                "cropHeight": cropHeight,
+                "cropWidth": cropWidth,
+                "csrfmiddlewaretoken": csrftoken,
+            }
             $.ajax({
-                url: url,
-                method: "post",
+                url: "/connection/cropping-image/",
                 dataType: "json",
-                data: {
-                    "csrfmiddlewaretoken": csrftoken,
-                },
+                method: "post",
+                data: data,
                 success: function (data) {
                     if (data.success) {
-                        let message;
-                        var numb_of_flowing = $(".flw-status .following").text();
-                        console.log(numb_of_flowing)
-                        if (data.flw) {
-                            message = "You are now following";
-                            $(e.target).text("Unfollow");
-                            $(".flw-status .following").text(parseInt(numb_of_flowing) + 1)
-                        } else {
-                            message = "You have been remove from the followers of"
-                            $(e.target).text("Follow")
-                            $(".flw-status .following").text(parseInt(numb_of_flowing) - 1)
-                        }
-                        alertUser(`${message}`, `${data.following}`)
-                        // update the btn and the number of following
+                        console.log("there is a success");
+                        // need to come back here later to do
+                        // window.location.reload();
                     } else {
                         alert(data.error)
                     }
                 },
-                error: function (e) {
-                    console.log(e)
+                error: function (error) {
+
+                },
+                complete: function () {
+                    // hide the loading to tell the user the operation is done
+                    alert(" the ajax call is complete ")
                 }
             })
-        }
-    })
 
-    $("#user_profile").on("click", (e) => {
+        } else {
+            alert("Please Upload an image less than")
+        }
+
+    }
+    function editUserProfile(e) {
         var profile_slug = window.location.pathname.split("/").at(-2)
         var url = `/connection/update-profile/${profile_slug}/`
         var loading_div = `
@@ -252,7 +307,7 @@ $(document).ready(function () {
 
         } else { return; }
         $("#UserProfileModal #UpdateProfileBtn").on("click", (e) => {
-            if (!(target_name === "avatar")) { // we handle the image update differently               
+            if ((target_name !== "avatar")) { // we handle the image update differently               
                 console.log("the submit btn has been clicked")
                 var _form_data = $("#UserProfileForm").serialize()
                 e.preventDefault();
@@ -267,7 +322,7 @@ $(document).ready(function () {
                             $("#UserProfileModal").modal("hide")
                             $("#UserProfileForm")[0].reset();
                             // Update the UI
-                            var span = $("#user_profile").find(`span.${data.field_name}`)
+                            var span = $("#user_profile").find(`p.${data.field_name}`)
                             $(span).text(data.new_value)
 
                         }
@@ -282,85 +337,49 @@ $(document).ready(function () {
                 CropImage(imageString, cropX, cropY, cropWidth, cropHeight, max_size)
             }
         })
-    });
-
-    $("#forge_link_status").on("click", (e) => {
-        if ($(e.target).attr('id') === "ForgeNewLink") return ForgeNewLink(e);
-        if ($(e.target).attr('id') === "CancelLinkForge") return cancelForgeLink(e);
-    });
-    $("[data-role='AcceptForgeLink']").on("click", (e) => {
-        acceptLinkForge(e);
-    });
-    $("[data-role='DeleteForgeLink']").on("click", (e) => {
-        deleteLinkForge(e);
-    });
-
-
-    // #################### function sections here ################
-
-    function setImageProperties(image, x, y, width, height) {
-        imageString = image;
-        cropX = x;
-        cropY = y;
-        cropWidth = width;
-        cropHeight = height;
     }
-    function CheckImageSize(image, max_upload_size) {
-        console.log("the check image size function run")
-        var startIndex = image.indexOf("base64,") + 7
-        var imageBase64 = image.substring(startIndex)
-        var decodedImg = atob(imageBase64)
-        if (decodedImg >= max_upload_size) {
-            return null;
-        } else {
-            return imageBase64
-        }
-    }
-    // the rolw of this function is to send the image as a string
-    // since ajax cannot send image files
-    function CropImage(image, cropX, cropY, cropWidth, cropHeight, max_upload_size) {
-        console.log(cropX)
-        //fisrt check if the size of the image is not greater than size allowed
-        // in the settings.py file
-        var imageString = CheckImageSize(image, max_upload_size);
-        if (imageString !== null) {
-            var data = {
-                "imageString": imageString,
-                "cropX": cropX,
-                "cropY": cropY,
-                "cropHeight": cropHeight,
-                "cropWidth": cropWidth,
+    function FollowUnfollowProfile(e) {
+        var target = $(e.target)
+        var name = $(target).attr("name");
+        var profile_slug = window.location.pathname.split("/").at(-2)
+        var url = `/social/add-remove-follower/${profile_slug}/`
+        $.ajax({
+            url: url,
+            method: "post",
+            dataType: "json",
+            data: {
+                "data_name": name,
                 "csrfmiddlewaretoken": csrftoken,
-            }
-            $.ajax({
-                url: "/connection/cropping-image/",
-                dataType: "json",
-                method: "post",
-                data: data,
-                success: function (data) {
-                    if (data.success) {
-                        console.log("there is a success");
-                        // need to come back here later to do
-                        // window.location.reload();
+            },
+            success: function (data) {
+                if (data.success) {
+                    let message;
+                    var numb_of_flowing = $(".flw-status .followers").text();
+                    console.log(numb_of_flowing, "nub of followers")
+                    if (e.target.getAttribute("name") === "flww") {
+                        message = "You are now following";
+                        $(e.target).text("Unfollow");
+                        $(e.target).attr("name", "unflww");
+                        $(".flw-status .followers").text(parseInt(numb_of_flowing) + 1)
                     } else {
-                        alert(data.error)
+                        message = "You have been remove from the followers of"
+                        $(e.target).text("Follow")
+                        $(e.target).attr("name", "flww");
+                        $(".flw-status .followers").text(parseInt(numb_of_flowing) - 1)
                     }
-                },
-                error: function (error) {
-
-                },
-                complete: function () {
-                    // hide the loading to tell the user the operation is done
-                    alert(" the ajax call is complete ")
+                    alertUser(`${message}`, `${data.following}`)
+                    // update the btn and the number of following
+                } else {
+                    console.log(data.error)
+                    alert(data.error)
                 }
-            })
-
-        } else {
-            alert("Please Upload an image less than")
-        }
+            },
+            error: function (e) {
+                console.log(e)
+            }
+        })
 
     }
-
     function alertUser(key, message) {
         alertify.set('notifier', 'position', 'top-right');
         alertify.set('notifier', 'delay', 7);
@@ -611,8 +630,9 @@ $(document).ready(function () {
 
     }
     function cancelForgeLink(e) {
-        console.log($(e.target).attr("id"));
-        var profile_slug = (window.location.pathname).split("/").at(-2)
+        var profile_slug = $(e.target).attr("profile-slug") ? $(e.target).attr("profile-slug") :
+            (window.location.pathname).split("/").at(-2)
+        console.log(profile_slug)
         data = { "profile_slug": profile_slug, "csrfmiddlewaretoken": csrftoken, }
         $.ajax({
             url: "/connection/cancel-forge-link/",
@@ -624,8 +644,8 @@ $(document).ready(function () {
                 if (data.success) {
                     console.log("ok");
                     alertUser("Your request to forge a link", "has been cancelled successfully!")
-                    $(e.target).attr("id", "ForgeNewLink")
-                    $(e.target).text("Forge a Link")
+                    $(e.target).attr("data-role", "ForgeNewLink")
+                    $(e.target).text("Connect")
                 } else {
                     alert(data.error)
                 }
@@ -637,7 +657,9 @@ $(document).ready(function () {
     }
     function ForgeNewLink(e) {
         $(e.target).attr("disabled", true)
-        var profile_slug = (window.location.pathname).split("/").at(-2)
+        var profile_slug = $(e.target).attr("profile-slug") ? $(e.target).attr("profile-slug") :
+            (window.location.pathname).split("/").at(-2)
+        console.log(profile_slug)
         data = { "profile_slug": profile_slug, "csrfmiddlewaretoken": csrftoken, }
         $.ajax({
             url: "/connection/sending-link-forge/",
@@ -648,8 +670,9 @@ $(document).ready(function () {
                 if (data.error) {
                     alert(data.error)
                 } else {
-                    $(e.target).attr("id", "CancelLinkForge");
-                    $(e.target).text("Cancel Forge Link")
+                    (e.target.id) ? $(e.target).attr("id", "CancelLinkForge") :
+                        $(e.target).attr("data-role", "CancelLinkForge")
+                    $(e.target).text("Cancel connection request")
                     $(e.target).prop("disabled", false)
                     alertUser(`Your Request to forge a link has been sent successfully to`, `${data.profile_owner}`)
                 }
@@ -660,7 +683,28 @@ $(document).ready(function () {
             }
         })
     }
+    function unLink(e) {
+        $(e.target).attr("disabled", true)
+        var request_id = $(e.target).attr("removee-id")
+        data = { "removee_id": request_id, "csrfmiddlewaretoken": csrftoken, }
+        $.ajax({
+            url: "/connection/unlink-forge-link/",
+            type: "post",
+            data: data,
+            dataType: "json",
+            success: (data) => {
+                if (data.success) {
+                    var _accepted = `<p class="acceptedRequest"> You and ${data.sender} are no longer connected</p>`
+                    var ul_parent = $(e.target).parent().parent()
+                    ul_parent.replaceWith(_accepted);
 
+                } else {
+                    alert(data.error)
+                    $(e.target).prop("disabled", false)
+                }
+            }
+        })
+    }
     function acceptLinkForge(e) {
         $(e.target).attr("disabled", true)
         var request_id = $(e.target).attr("data-request-id")
@@ -677,16 +721,15 @@ $(document).ready(function () {
                     if (($(e.target).parent().parent()).attr("id") === "requestAcc_or_dec") {
                         console.log("your are in the proifle page ")
                         $("#requestAcc_or_dec").fadeOut();
-                        var con_numb = $("#all-connections").text()
+                        var con_numb = $("#all-connections").next().text()
                         console.log(con_numb);
-                        $("#all-connections").text(parseInt(con_numb) + 1)
+                        $("#all-connections").Filenext().text(parseInt(con_numb) + 1)
                     } else {
                         var _accepted = `<p class="acceptedRequest"> You and ${data.sender} are now connected</p>`
-                        console.log("you are in the connections list page");
                         var ul_parent = $(e.target).parent().parent()
                         ul_parent.replaceWith(_accepted);
                     }
-                    alertUser("You and ", `${data.sender} are now Linked`)
+                    alertUser("You and ", `${data.sender} are now connected`)
                 } else {
                     alert(data.error)
                     $(e.target).prop("disabled", false)
@@ -708,10 +751,11 @@ $(document).ready(function () {
                 if (data.success) {
                     //update the connection btn
                     if (($(e.target).parent().parent()).attr("id") === "requestAcc_or_dec") {
-                        console.log("your are in the proifle page ")
                         $("#requestAcc_or_dec").fadeOut();
-                    } else {
-                        console.log("you are in the connections list page");
+                    } else if ($(e.target).parent().parent().parent().attr("class") === "company_profile_info") {
+                        $(e.target).parent().parent().parent().fadeOut()
+                    }
+                    else {
                         $(`#col_parent_${request_id}`).fadeOut();
                     }
                     alertUser("connection Request deleted", `successfully!`)

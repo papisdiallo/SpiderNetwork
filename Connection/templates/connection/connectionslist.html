@@ -54,24 +54,19 @@
                 <div class="company_profile_info">
                   <div class="company-up-info">
                     <img src="{{connection.profile.avatar.url}}" alt="" />
-                    <h3>{{connection.user.username}}</h3>
+                    <h3>{{connection.username}}</h3>
                     <h4>Graphic Designer</h4>
                     <ul>
-                      <li><a href="#" title="" class="follow">Disconnect</a></li>
-                      <li>
-                        <a href="#" title="" class="message-us"
-                          ><i class="fa fa-trash-o"></i
-                        ></a>
-                      </li>
-                      <li><a href="#" title="" class="hire-us">Delete</a></li>
+                      <li><a href="{% url 'chat' username=connection.username %}" title="" class="hire-us">Message</a></li>
+                      <li><a href="#" removee-id= "{{connection.id}}" data-role="Disconnect" class="follow">Disconnect</a></li>
                     </ul>
                   </div>
                   <a
                     href="{% url 'profile-list-view' user_slug=connection.profile.profile_slug %}"
                     title=""
-                    class="view-more-pro"
-                    >View Profile</a
-                  >
+                    class="view-more-pro">
+                    View Profile
+                  </a>
                 </div>
               </div>
               {% empty %}

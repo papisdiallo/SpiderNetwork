@@ -37,8 +37,10 @@ INSTALLED_APPS = [
     # installed apps
     'landing.apps.LandingConfig',
     'social.apps.SocialConfig',
+    'chat.apps.ChatConfig',
     'Connection.apps.ConnectionConfig',
     'crispy_forms',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -80,6 +82,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'socialNetwork.wsgi.application'
+ASGI_APPLICATION = 'socialNetwork.asgi.application'
+# ASGI_APPLICATION = 'socialNetwork.routing.application'
 
 
 # Database
@@ -146,3 +150,14 @@ LOGIN_REDIRECT_URL = "post-list-view"
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 EMAIL_ACCOUNT_REQUIRED = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# channels layers config
+CHANNEL_LAYERS = {
+    "default": {
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        # "CONFIG": {
+        #     "hosts": [("localhost", 6379)],
+        # },
+    },
+}

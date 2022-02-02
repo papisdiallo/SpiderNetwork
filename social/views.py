@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
-from .models import Post, Files, UserProfile, Comment
+from .models import Post, Files, UserProfile, Comment, UserFollowing
 from django.template.loader import render_to_string
 from .forms import PostForm, CommentPostForm, UserProfileForm
 from django.template.context_processors import csrf
@@ -139,6 +139,8 @@ class UserProfileView(LoginRequiredMixin, View):
         # relationship that they do have with the owner of the profile
         ForgeLinkStatus = None  # by default
         follower = False
+        followers = profile.user.followers.count()
+        following = profile.user.following.count()
         request_sender = None
         forgeLink_id = None
         connections = None
@@ -146,8 +148,6 @@ class UserProfileView(LoginRequiredMixin, View):
             receiver=profile.user, is_active=True)
         is_profile_owner = True  # by default
         are_connected = False  # by default
-        if current_user in profile.following.all():
-            follower = True
         if profile.user == current_user:
             # CASE 1 user looking to his own profile
             is_profile_owner = True
@@ -155,6 +155,9 @@ class UserProfileView(LoginRequiredMixin, View):
             connections = con_list.connections.all()
         else:  # that means the user is looking to another user's profile
             is_profile_owner = False
+            for follower in profile.user.followers.all():
+                if follower.user_id == current_user:
+                    follower = True
             # getting all the connectins of the current profile
             con_list = ConnectionsList.objects.get(user=profile.user)
             connections = con_list.connections.all()
@@ -175,7 +178,6 @@ class UserProfileView(LoginRequiredMixin, View):
                         sender=current_user, receiver=profile.user).id
                 else:  # means none of you sent the other a forget link CASE 5
                     ForgeLinkStatus = connectionRequestStatus.NO_CON_REQUEST.value
-
         context = {
             "profile": profile, "posts": posts,
             "form": form, "no_padding": noPadding,
@@ -186,6 +188,8 @@ class UserProfileView(LoginRequiredMixin, View):
             "ForgeLinkStatus": ForgeLinkStatus,
             "req_sender": request_sender,
             "follower": follower,
+            "followers": followers,
+            "following": following,
         }
         return render(request, "landing/profile.html", context)
 
@@ -261,21 +265,31 @@ class AddRemovePostLikes(View):
 class AddRemoveFollowers(LoginRequiredMixin, View):
     def post(self, request, profile_slug, *args, **kwargs):
         payload = dict()
+        user = request.user
+        data_name = request.POST.get("data_name")
         try:
             profile = UserProfile.objects.get(profile_slug=profile_slug)
-            followers = profile.followers.all()
-            user = request.user
-            if not user in followers:
-                profile.followers.add(user)
-                payload["is_flw"] = True
-            else:
-                profile.followers.remove(user)
-                payload["is_flw"] = False
-            profile.save()
-            payload["success"] = True
             payload["following"] = profile.user.username
+            if data_name == "flww":
+                try:
+                    user_fol = UserFollowing.objects.get(
+                        user_id=user, following_user_id=profile.user)
+                    if user_fol:
+                        payload['error'] = "You are already following this profile"
+                except UserFollowing.DoesNotExist:
+                    UserFollowing.objects.create(
+                        user_id=user, following_user_id=profile.user)
+                    payload['success'] = True
+            elif data_name == "unflww":
+                try:
+                    user_fol = UserFollowing.objects.get(
+                        user_id=user, following_user_id=profile.user)
+                    user_fol.delete()
+                    payload["success"] = True
+                except UserFollowing.DoesNotExist:
+                    payload['error'] = "You are not following this profile"
         except UserProfile.DoesNotExist:
-            payload['error'] = "An Error happenned .Please Try later!"
+            payload['error'] = "Sorry, But following or unfollowing this profile now is not possible. Try later..."
         return JsonResponse(payload)
 
 
@@ -307,7 +321,22 @@ class searchView(View):
                 email__icontains=q) | Q(profile__full_name__icontains=q)
         ).distinct()
         search_list_result = []
-        for _user in found_users:
-            search_list_result.append((_user, user_links.areLinked(_user)))
+        for a_user in found_users:
+            search_list_result.append((a_user, user_links.areLinked(a_user)))
+            if not user_links.areLinked(a_user):
+                are_connected = False  # they are not connected at all
+                if get_forge_link_or_false(sender=a_user, receiver=current_user) != False:
+                    # means they sent you a forge link CASE 3
+                    ForgeLinkStatus = connectionRequestStatus.THEY_SENT_CON_REQUEST.value
+                    forgeLink_id = get_forge_link_or_false(
+                        sender=a_user, receiver=current_user).id
+                    request_sender = a_user.username
+                elif get_forge_link_or_false(sender=current_user, receiver=a_user) != False:
+                    # means you sent them a forge link CASE 4
+                    ForgeLinkStatus = connectionRequestStatus.YOU_SENT_CON_REQUEST.value
+                    forgeLink_id = get_forge_link_or_false(
+                        sender=current_user, receiver=a_user).id
+                else:  # means none of you sent the other a forget link CASE 5
+                    ForgeLinkStatus = connectionRequestStatus.NO_CON_REQUEST.value
         context = {"found_users_list": search_list_result, }
         return render(request, "social/search_result.html", context)

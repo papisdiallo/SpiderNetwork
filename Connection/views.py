@@ -7,6 +7,8 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.files import File
+from django.db.models import Q
+from chat.models import singleOneToOneRoom
 import cv2
 from .utils import (
     is_ajax, convertDimensions,
@@ -74,7 +76,7 @@ def crop_image(request):
             user.profile.avatar.save(
                 f"{user.id}_profile_image.png", File(open(url, "rb")))
             payload["success"] = True
-            # payload["profile_url"] = user.profile.avatar.url
+            payload["profile_url"] = user.profile.avatar.url
         except Exception as e:
             payload["success"] = False
             payload["error"] = e
@@ -157,6 +159,16 @@ def acceptForgeLink(request):
             link = ForgeLink.objects.get(pk=request_id)
             link.accept()
             link.save()
+            # creating the chat room for these 2 new connected users
+            user1, user2 = link.sender, link.receiver
+
+            q_filter = Q(first_user=user1, second_user=user2) | Q(
+                first_user=user2, second_user=user1)
+            qs = singleOneToOneRoom.objects.filter(q_filter).exists()
+            if not qs:
+                chat_room = f"room-{user1.id}-{user2.id}"
+                singleOneToOneRoom.objects.create(
+                    first_user=user1, second_user=user2, room_name=chat_room)
             payload["success"] = True
             payload["sender"] = link.sender.username
         except ForgeLink.DoesNotExist:
@@ -171,13 +183,14 @@ def Unlink(request):
     if is_ajax(request=request) and request.method == 'POST':
         removee_id = request.POST.get("removee_id")
         # need to check if the removee is inside of the list of connections
-        # first before making the remove action. User the areLinked method
+        # first before making the remove action. Use the areLinked method
         removee = User.objects.get(pk=removee_id)
         try:
             link = ConnectionsList.objects.get(user=user)
             if link.areLinked(removee):  # just a simple check
-                link.unLink(removee)
+                link.unlink(removee)
                 payload["success"] = True
+                payload["sender"] = removee.username
             else:
                 payload["error"] = f"You can only remove a user within your connections"
         except ConnectionsList.DoesNotExist:

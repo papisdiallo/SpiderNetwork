@@ -6,6 +6,7 @@ from .views import (
     cancelForgeLink,
     acceptForgeLink,
     deleteForgeLink,
+    Unlink,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("cancel-forge-link/", cancelForgeLink, name="cancel-link-forge"),
     path("accept-forge-link/", acceptForgeLink, name="accept-link-forge"),
     path("delete-forge-link/", deleteForgeLink, name="delete-link-forge"),
+    path("unlink-forge-link/", Unlink, name="unlink-link-forge"),
 ]

@@ -24,22 +24,22 @@
                     <ul>
                       <li>
                           {% if user.1 %}
-                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button" data-role="AcceptForgeLink">
+                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button">
                           Message
                         </a>
                         {% elif not user.1 and user.0 != request.user %}
-                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button" data-role="AcceptForgeLink">
+                        <a class="btn btn-outline-success follow" profile-slug={{user.0.profile.profile_slug}} data-request-id="{{user.0.id}}" role="button" data-role="ForgeNewLink">
                             Connect
                         </a>
                         {% endif %}
                         {% if user.0 == request.user %}
-                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button" data-role="AcceptForgeLink">
+                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button">
                             That's you 
                         </a>
                         {% endif %}
                       </li>
                       <li>
-                        <a class="btn btn-outline-dark hire-us" data-request-id="{{user.0.id}}" role="button" data-role="DeleteForgeLink">
+                        <a class="btn btn-outline-dark hire-us" data-request-id="{{user.0.id}}" role="button">
                             connections
                         </a>
                       </li>
