@@ -141,7 +141,6 @@ $(document).ready(function () {
         }
     });
     $(".user_profile").on("click", (e) => {
-        console.log(e.target.href)
         if (e.target.href) return editUserProfile(e);
         if ((e.target.name) && !(e.target.href)) return FollowUnfollowProfile(e);
 
@@ -178,8 +177,6 @@ $(document).ready(function () {
         cropHeight = height;
     }
     function CheckImageSize(image, max_upload_size) {
-        console.log("the check image size function run")
-        console.log(image)
         var startIndex = image.indexOf("base64,") + 7
         var imageBase64 = image.substring(startIndex)
         var decodedImg = atob(imageBase64)
@@ -191,8 +188,7 @@ $(document).ready(function () {
     }
     // the rolw of this function is to send the image as a string
     // since ajax cannot send image files
-    function CropImage(image, cropX, cropY, cropWidth, cropHeight, max_upload_size) {
-        console.log(cropX)
+    function CropImage(image, cropX, cropY, cropWidth, cropHeight, max_upload_size, e) {
         //fisrt check if the size of the image is not greater than size allowed
         // in the settings.py file
         var imageString = CheckImageSize(image, max_upload_size);
@@ -212,20 +208,23 @@ $(document).ready(function () {
                 data: data,
                 success: function (data) {
                     if (data.success) {
-                        console.log("there is a success");
-                        // need to come back here later to do
-                        // window.location.reload();
+                        // updating the images places
+                        var aside_pro_img = $(".user_profile .user-pro-img img")
+                        $(aside_pro_img).attr("src", data.profile_url);
+                        var nav_pro_img = $(".user-account .user-info img");
+                        $(nav_pro_img).attr("src", data.profile_url);
+                        // fade out the modal and reset the form
+                        $("#UserProfileModal").modal("hide")
+                        $("#UserProfileForm")[0].reset();
+                        $(e.target).prop("disabled", false);
+                        $(e.target.nextElementSibling).fadeOut()
                     } else {
                         alert(data.error)
                     }
                 },
                 error: function (error) {
-
+                    console.log("error", error);
                 },
-                complete: function () {
-                    // hide the loading to tell the user the operation is done
-                    alert(" the ajax call is complete ")
-                }
             })
 
         } else {
@@ -261,8 +260,6 @@ $(document).ready(function () {
                                 $(el).addClass("d-none");
                                 $("#UserProfileForm").removeClass("d-none");
 
-                            } else {
-                                console.log("this should be an input")
                             }
                         })
                         if (target_name === "avatar") {
@@ -307,8 +304,9 @@ $(document).ready(function () {
 
         } else { return; }
         $("#UserProfileModal #UpdateProfileBtn").on("click", (e) => {
+            $(e.target).attr("disabled", true);
+            $(e.target.nextElementSibling).fadeIn()
             if ((target_name !== "avatar")) { // we handle the image update differently               
-                console.log("the submit btn has been clicked")
                 var _form_data = $("#UserProfileForm").serialize()
                 e.preventDefault();
                 $.ajax({
@@ -321,6 +319,8 @@ $(document).ready(function () {
                         if (data.success) {
                             $("#UserProfileModal").modal("hide")
                             $("#UserProfileForm")[0].reset();
+                            $(e.target).prop("disabled", false);
+                            $(e.target.nextElementSibling).fadeOut()
                             // Update the UI
                             var span = $("#user_profile").find(`p.${data.field_name}`)
                             $(span).text(data.new_value)
@@ -333,8 +333,7 @@ $(document).ready(function () {
                 })
             } else {
                 e.preventDefault()
-                console.log("the avatar upload has run")
-                CropImage(imageString, cropX, cropY, cropWidth, cropHeight, max_size)
+                CropImage(imageString, cropX, cropY, cropWidth, cropHeight, max_size, e)
             }
         })
     }
@@ -716,14 +715,13 @@ $(document).ready(function () {
             dataType: "json",
             success: (data) => {
                 if (data.success) {
-
                     //update the connection btn
                     if (($(e.target).parent().parent()).attr("id") === "requestAcc_or_dec") {
                         console.log("your are in the proifle page ")
                         $("#requestAcc_or_dec").fadeOut();
                         var con_numb = $("#all-connections").next().text()
                         console.log(con_numb);
-                        $("#all-connections").Filenext().text(parseInt(con_numb) + 1)
+                        $("#all-connections").next().text(parseInt(con_numb) + 1)
                     } else {
                         var _accepted = `<p class="acceptedRequest"> You and ${data.sender} are now connected</p>`
                         var ul_parent = $(e.target).parent().parent()
@@ -819,12 +817,12 @@ $(document).ready(function () {
             $(`.posts-section [data-slug=${post_slug}]`).replaceWith(data_template);
         }
     }
-    async function srcToFile(src, fileName, mimeType) {
-        return (fetch(src)
-            .then(function (res) { return res.arrayBuffer(); })
-            .then(function (buf) { return new File([buf], fileName, { type: mimeType }); })
-        );
-    }
+    // async function srcToFile(src, fileName, mimeType) {
+    //     return (fetch(src)
+    //         .then(function (res) { return res.arrayBuffer(); })
+    //         .then(function (buf) { return new File([buf], fileName, { type: mimeType }); })
+    //     );
+    // }
     async function srcToFile2(src, fileName, mimeType) {
         const res = await fetch(src)
         const arr = await res.arrayBuffer()

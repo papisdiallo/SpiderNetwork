@@ -25,7 +25,6 @@ def get_forge_link_or_false(sender, receiver):
 
 
 def save_Base64_Temp_ImageString(imageString):
-    print("the save base64 image string ran")
     INCORRECT_PADDING_EXCEPTION = "Incorrect padding"
     try:
         if not os.path.exists(settings.TEMP):
@@ -36,7 +35,6 @@ def save_Base64_Temp_ImageString(imageString):
         with storage.open("", "wb+") as destination:
             destination.write(image)
             destination.close()
-
         return url
     except Exception as e:
         if str(e) == INCORRECT_PADDING_EXCEPTION:

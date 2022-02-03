@@ -3,7 +3,7 @@
   <div class="container">
     <div class="header-data">
       <div class="logo">
-        <a href="index.html" title=""><img src="{% static 'landing/images/logo_1.png' %}" alt="" style="width: 38px;" /></a>
+        <a href="{% url 'post-list-view' %}" title=""><img src="{% static 'landing/images/logo_1.png' %}" alt="" style="width: 38px;" /></a>
       </div>
       <div class="search-bar">
         <form method="get" action={% url 'search-list' %}>

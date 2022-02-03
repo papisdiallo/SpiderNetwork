@@ -155,8 +155,8 @@ class UserProfileView(LoginRequiredMixin, View):
             connections = con_list.connections.all()
         else:  # that means the user is looking to another user's profile
             is_profile_owner = False
-            for follower in profile.user.followers.all():
-                if follower.user_id == current_user:
+            for flw in profile.user.followers.all():
+                if flw.user_id.id == current_user.id:
                     follower = True
             # getting all the connectins of the current profile
             con_list = ConnectionsList.objects.get(user=profile.user)
@@ -296,12 +296,14 @@ class AddRemoveFollowers(LoginRequiredMixin, View):
 class ConnectionsListView(LoginRequiredMixin, View):
     def get(self, request, profile_slug, *arg, **kwargs):
         user = UserProfile.objects.get(profile_slug=profile_slug).user
+        is_profile_owner = user == self.request.user
         con_list = ConnectionsList.objects.get(user=user)
         connections = con_list.connections.all()  # get all the conn of the user
         con_request = ForgeLink.objects.filter(receiver=user, is_active=True)
         context = {
             "connections": connections,
             "con_request": con_request,
+            "is_profile_owner": is_profile_owner,
         }
         return render(request, "connection/connectionslist.html", context)
 
@@ -325,17 +327,17 @@ class searchView(View):
             search_list_result.append((a_user, user_links.areLinked(a_user)))
             if not user_links.areLinked(a_user):
                 are_connected = False  # they are not connected at all
-                if get_forge_link_or_false(sender=a_user, receiver=current_user) != False:
+                if get_forge_link_or_false(sender=a_user, receiver=user) != False:
                     # means they sent you a forge link CASE 3
                     ForgeLinkStatus = connectionRequestStatus.THEY_SENT_CON_REQUEST.value
                     forgeLink_id = get_forge_link_or_false(
-                        sender=a_user, receiver=current_user).id
+                        sender=a_user, receiver=user).id
                     request_sender = a_user.username
-                elif get_forge_link_or_false(sender=current_user, receiver=a_user) != False:
+                elif get_forge_link_or_false(sender=user, receiver=a_user) != False:
                     # means you sent them a forge link CASE 4
                     ForgeLinkStatus = connectionRequestStatus.YOU_SENT_CON_REQUEST.value
                     forgeLink_id = get_forge_link_or_false(
-                        sender=current_user, receiver=a_user).id
+                        sender=user, receiver=a_user).id
                 else:  # means none of you sent the other a forget link CASE 5
                     ForgeLinkStatus = connectionRequestStatus.NO_CON_REQUEST.value
         context = {"found_users_list": search_list_result, }

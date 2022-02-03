@@ -36,10 +36,13 @@ def getUserProfileForm(request, profile_slug):
         else:
             if form.is_valid():
                 # getting the changed field name
-                field_name = form.changed_data[0]
-                field_obj = UserProfile._meta.get_field(field_name)
-                # get the new value of the field
-                field_value = field_obj.value_from_object(profile)
+                field_name = None
+                field_value = None
+                if len(form.changed_data) > 0:
+                    field_name = form.changed_data[0]
+                    field_obj = UserProfile._meta.get_field(field_name)
+                    # get the new value of the field
+                    field_value = field_obj.value_from_object(profile)
                 form.save()
                 payload["success"] = True
                 payload["new_value"] = field_value

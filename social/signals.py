@@ -64,12 +64,14 @@ def delete_old_file(sender, instance, **kwargs):
         return False
 
     try:
+        # I need to check if the avatar is not the default at all
+        # before deleting the image
         old_file = sender.objects.get(pk=instance.pk).avatar
     except sender.DoesNotExist:
         return False
 
     # comparing the new file to the old one
     file = instance.avatar
-    if not old_file == file:
+    if not old_file == file and old_file.url != "/media/default/default.png":
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)

@@ -9,6 +9,7 @@
       {% include "landing/partials/header.html" %}
       <section class="companies-info">
         <div class="container">
+          {% if is_profile_owner %}
           <div class="company-title">
             <h3>All Connections Request</h3>
           </div>
@@ -44,6 +45,7 @@
               {% endfor %}
             </div>
           </div>
+          {% endif %}
           <div class="company-title">
             <h3>All Connections</h3>
           </div>
