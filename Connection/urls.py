@@ -7,6 +7,8 @@ from .views import (
     acceptForgeLink,
     deleteForgeLink,
     Unlink,
+    cleanUnreadNotif,
+    prunePresenceAjaxView
 )
 
 urlpatterns = [
@@ -18,4 +20,6 @@ urlpatterns = [
     path("accept-forge-link/", acceptForgeLink, name="accept-link-forge"),
     path("delete-forge-link/", deleteForgeLink, name="delete-link-forge"),
     path("unlink-forge-link/", Unlink, name="unlink-link-forge"),
+    path("cleanUnreadNotif/", cleanUnreadNotif, name="cleanUnreadNotif"),
+    path("prune_presence/", prunePresenceAjaxView, name="prunePresenceAjaxView"),
 ]

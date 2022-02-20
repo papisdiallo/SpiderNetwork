@@ -1,6 +1,8 @@
 
 
 from pathlib import Path
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'Connection.apps.ConnectionConfig',
     'crispy_forms',
     'channels',
+
 ]
 
 MIDDLEWARE = [
@@ -76,6 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "social.templateProcessors.active_notifications",
             ],
         },
     },
@@ -151,6 +155,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 EMAIL_ACCOUNT_REQUIRED = True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# this is the max age for the connection to expire
+CHANNELS_PRESENCE_MAX_AGE = 60  # this is in seconds
 # channels layers config
 CHANNEL_LAYERS = {
     "default": {
@@ -160,4 +166,15 @@ CHANNEL_LAYERS = {
         #     "hosts": [("localhost", 6379)],
         # },
     },
+}
+
+CELERYBEAT_SCHEDULE = {
+    'prune-presence': {
+        'task': 'channels_presence.tasks.prune_presences',
+        'schedule': timedelta(seconds=60)
+    },
+    'prune-rooms': {
+        'task': 'channels_presence.tasks.prune_rooms',
+        'schedule': timedelta(seconds=600)
+    }
 }

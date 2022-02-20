@@ -20,26 +20,42 @@
                   <div class="company-up-info">
                     <img src="{{user.0.profile.avatar.url}}" alt="" />
                     <h3>{% if not user.profile.full_name %}{{user.0.username}} {% else %}{{user.profile.full_name}} {% endif %}</h3>
-                    <h4>Graphic Designer</h4>
+                    <h4>{{user.profile.work_at}}</h4>
                     <ul>
                       <li>
-                          {% if user.1 %}
-                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button">
-                          Message
-                        </a>
-                        {% elif not user.1 and user.0 != request.user %}
-                        <a class="btn btn-outline-success follow" profile-slug={{user.0.profile.profile_slug}} data-request-id="{{user.0.id}}" role="button" data-role="ForgeNewLink">
-                            Connect
-                        </a>
+                        {% if user.1 %}
+                          <a href="{% url 'chat' username=user.0.username  %}" class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button">
+                            Message
+                          </a>
+                        {% elif user.0 == request.user %}
+                          <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button">
+                              That's you 
+                          </a>
+                        {% else %}
+                          {% if user.2 == 0 %}
+                            <a class="btn btn-outline-success follow" profile-slug={{user.0.profile.profile_slug}} data-request-id="{{user.0.id}}" role="button" data-role="ForgeNewLink">
+                                Connect
+                            </a>
+                          {% elif  user.2 == 1 %}
+                            <a class="btn btn-outline-success follow" profile-slug={{user.0.profile.profile_slug}} data-request-id="{{user.0.id}}" role="button" data-role="CancelLinkForge">
+                              Cancel Connection Request
+                            </a>
+                          {% elif  user.2 == 2 %}
+                          <div id="requestAcc_or_dec ml-1">
+                            <div class="req_sender">
+                              <p><strong>{{req_sender}}</strong> sent you a connection request</p>
+                            </div>
+                            <div class="mb-2">
+                              <button data-request-id="{{user.3}}" data-role="AcceptForgeLink" class="btn btn-outline-success" >Accept</button>
+                              <button data-request-id="{{user.3}}" data-role="DeleteForgeLink" class="btn btn-outline-dark" >Delete</button>
+                            </div>
+                          </div>
+                          {% endif %}
                         {% endif %}
-                        {% if user.0 == request.user %}
-                        <a class="btn btn-outline-success follow" data-request-id="{{user.0.id}}" role="button">
-                            That's you 
-                        </a>
-                        {% endif %}
+                        
                       </li>
                       <li>
-                        <a class="btn btn-outline-dark hire-us" data-request-id="{{user.0.id}}" role="button">
+                        <a  href="{% url 'all-connection-view' profile_slug=user.0.profile.profile_slug  %}" class="btn btn-outline-dark hire-us" data-request-id="{{user.0.id}}" role="button">
                             connections
                         </a>
                       </li>

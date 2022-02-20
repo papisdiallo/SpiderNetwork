@@ -73,3 +73,27 @@ class UserFollowing(models.Model):
 
     def __str__(self):
         return f"{self.user_id.username} follows {self.following_user_id.username}"
+
+
+class Notification(models.Model):
+    type_of = (
+        ("1", "new_post"),
+        ("2", "liked_post"),
+        ("3", "commented_post"),
+        ("4", "acceted_connection"),
+        ("5", "sent_connection"),
+    )
+    user_from = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="notif_from", blank=True, null=True)
+    user_to = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="notif_to", blank=True, null=True)
+    message = models.TextField()
+    seen = models.BooleanField(default=False)
+    type_off = models.CharField(max_length=200, choices=type_of, default="1")
+    date_sent = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"notif_from_{self.user_from.username}"
+
+    class Meta:
+        ordering = ("-date_sent",)

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from social.models import UserProfile
+from social.models import UserProfile, Notification
 from .models import ConnectionsList, ForgeLink
 from social.forms import UserProfileForm
 from django.template.loader import render_to_string
@@ -8,12 +8,15 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.files import File
 from django.db.models import Q
-from chat.models import singleOneToOneRoom
+from chat.models import singleOneToOneRoom, Connected
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 import cv2
 from .utils import (
     is_ajax, convertDimensions,
     save_Base64_Temp_ImageString,
-    get_forge_link_or_false
+    get_forge_link_or_false,
+    prune_presence,
 )
 from django.contrib.auth import get_user_model
 
@@ -102,6 +105,24 @@ def Sending_Link_Forge(request):
                     old_Link.save()
                     payload["success"] = True
                     payload["profile_owner"] = receiver.username
+                    channel_layer = get_channel_layer()
+                    room_name = f"comment_or_post_listener_{receiver.id}"
+                    new_notif = Notification.objects.create(
+                        user_from=user, user_to=receiver,
+                        message="sent you a connection request",
+                        type_off=5
+                    )
+                    async_to_sync(channel_layer.group_send)(
+                        room_name,
+                        {
+                            "type": "send_notification_to_post_author",
+                            "liker": new_notif.user_from.username,
+                            "notification": new_notif.message,
+                            "avatar_url": new_notif.user_from.profile.avatar.url,
+                            "date_notif": new_notif.date_sent,
+                            "notif_type": new_notif.type_off,
+                        }
+                    )
                 else:
                     payload["error"] = "You have already sent a link request to this user"
             else:  # means there is not old request at all
@@ -114,6 +135,25 @@ def Sending_Link_Forge(request):
             new_con = ForgeLink.objects.create(
                 sender=user, receiver=receiver)
             new_con.save()
+            # hangle the notification to the receiver......
+            channel_layer = get_channel_layer()
+            room_name = f"comment_or_post_listener_{receiver.id}"
+            new_notif = Notification.objects.create(
+                user_from=user, user_to=receiver,
+                message="sent you a connection request",
+                type_off=5
+            )
+            async_to_sync(channel_layer.group_send)(
+                room_name,
+                {
+                    "type": "send_notification_to_post_author",
+                    "liker": new_notif.user_from.username,
+                    "notification": new_notif.message,
+                    "avatar_url": new_notif.user_from.profile.avatar.url,
+                    "date_notif": new_notif.date_sent,
+                    "notif_type": new_notif.type_off,
+                }
+            )
             payload["success"] = True
             payload["profile_owner"] = receiver.username
     return JsonResponse(payload)
@@ -173,6 +213,25 @@ def acceptForgeLink(request):
                 singleOneToOneRoom.objects.create(
                     first_user=user1, second_user=user2, room_name=chat_room)
             payload["success"] = True
+            # notify the user about the request acceptance
+            channel_layer = get_channel_layer()
+            room_name = f"comment_or_post_listener_{user1.id}"
+            new_notif = Notification.objects.create(
+                user_from=user2, user_to=user1,
+                message="has accepted your connection request",
+                type_off=4
+            )
+            async_to_sync(channel_layer.group_send)(
+                room_name,
+                {
+                    "type": "send_notification_to_post_author",
+                    "liker": new_notif.user_from.username,
+                    "notification": new_notif.message,
+                    "avatar_url": new_notif.user_from.profile.avatar.url,
+                    "date_notif": new_notif.date_sent,
+                    "notif_type": new_notif.type_off,
+                }
+            )
             payload["sender"] = link.sender.username
         except ForgeLink.DoesNotExist:
             payload["error"] = "Cannot accept this request now. Please Try later !!"
@@ -199,3 +258,35 @@ def Unlink(request):
         except ConnectionsList.DoesNotExist:
             payload["error"] = f"Cannot unlink {removee.username} now. Please try later!"
     return JsonResponse(payload)
+
+
+def cleanUnreadNotif(request):
+    current_user = request.user
+    if is_ajax(request=request):
+        type_of = request.GET.get("type_of", None)
+        if type_of == "msg":
+            notifs = Notification.objects.filter(
+                user_to=current_user, seen=False, type_off=6)
+            for notif in notifs:
+                notif.seen = True
+                notif.save()
+        else:
+            notifs = Notification.objects.filter(
+                user_to=current_user, seen=False).exclude(type_off=6)
+            for notif in notifs:
+                notif.seen = True
+                notif.save()
+
+        return JsonResponse({"success": True})
+
+
+def prunePresenceAjaxView(request):
+    if is_ajax(request=request):
+        if request.user.is_authenticated:
+            # need to get the room name or what
+            cons = Connected.objects.filter(user=request.user)
+            if cons:
+                prune_presence(cons)
+            else:
+                return JsonResponse({})
+    return JsonResponse({'success': True})

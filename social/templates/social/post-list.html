@@ -16,91 +16,28 @@
         </div>
         <div class="user-specs">
         <h3>{{request.user.username}}</h3>
-        <span>Graphic Designer at Self Employed</span>
+        <span>{{request.user.profile.work_at}}</span>
         </div>
         </div>
         <ul class="user-fw-status">
         <li>
         <h4>Following</h4>
-        <span>34</span>
+        <span>{{following}}</span>
         </li>
         <li>
         <h4>Followers</h4>
-        <span>155</span>
+        <span>{{followers}}</span>
         </li>
         <li>
         <a href="{% url 'profile-list-view' user_slug=request.user.profile.profile_slug %}" title="">View Profile</a>
         </li>
         </ul>
         </div>
-        <div class="suggestions full-width">
-        <div class="sd-title">
-        <h3>Suggestions</h3>
-        <i class="fa fa-ellipsis-v"></i>
-        </div>
-        <div class="suggestions-list">
-        <div class="suggestion-usd">
-        <img src="{% static 'landing/images/s1.png' %}" alt="">
-        <div class="sgt-text">
-        <h4>Jessica William</h4>
-        <span>Graphic Designer</span>
-        </div>
-        <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-        <img src="{% static 'landing/images/s2.png' %}" alt="">
-        <div class="sgt-text">
-        <h4>John Doe</h4>
-        <span>PHP Developer</span>
-        </div>
-        <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-        <img src="{% static 'landing/images/s3.png' %}" alt="">
-        <div class="sgt-text">
-        <h4>Poonam</h4>
-        <span>Wordpress Developer</span>
-        </div>
-        <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-        <img src="{% static 'landing/images/s4.png' %}" alt="">
-        <div class="sgt-text">
-        <h4>Bill Gates</h4>
-        <span>C & C++ Developer</span>
-        </div>
-        <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-        <img src="{% static 'landing/images/s5.png' %}" alt="">
-        <div class="sgt-text">
-        <h4>Jessica William</h4>
-        <span>Graphic Designer</span>
-        </div>
-        <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="suggestion-usd">
-        <img src="{% static 'landing/images/s6.png' %}" alt="">
-        <div class="sgt-text">
-        <h4>John Doe</h4>
-        <span>PHP Developer</span>
-        </div>
-        <span><i class="fa fa-plus"></i></span>
-        </div>
-        <div class="view-more">
-        <a href="#" title="">View More</a>
-        </div>
-        </div>
-        </div>
         <div class="tags-sec full-width">
         <ul>
-        <li><a href="#" title="">Help Center</a></li>
         <li><a href="#" title="">About</a></li>
          <li><a href="#" title="">Privacy Policy</a></li>
-        <li><a href="#" title="">Community Guidelines</a></li>
-        <li><a href="#" title="">Cookies Policy</a></li>
         <li><a href="#" title="">Career</a></li>
-        <li><a href="#" title="">Language</a></li>
         <li><a href="#" title="">Copyright Policy</a></li>
         </ul>
         <div class="cp-sec">
@@ -115,7 +52,7 @@
     <div class="main-ws-sec">
         <div class="post-topbar">
             <div class="user-picy">
-                <img src="{% static 'landing/images/user-pic' %}.png" alt="">
+                <img src="{{request.user.profile.avatar.url}}" alt="">
             </div>
             <div class="post-st">
                 <ul>
@@ -240,12 +177,15 @@
                     {% endfor %}
                     <div class="comment_box">             
                         <div class="cm_img">
-                            <img src="/static/landing/images/bg-img4.png" alt="">
+                            <img src="{{request.user.profile.avatar.url}}" alt="">
                         </div>
                         <form method="post" data-slug="{{post.post_slug}}">
                             {% csrf_token %}
                             <textarea name="content" placeholder="Comment on this post here..." cols="40" rows="2" required="" id="id_content"></textarea>
                             <button id="" name="commentpost" >Comment</button>
+                            <span class="loading-icon" style="float: right !important; margin-right: 3px; margin-top: 3px;">
+                                <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                            </span>
                         </form>
                     </div>
                 </div>

@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.views import View
 from django.http import JsonResponse
-from .models import Post, Files, UserProfile, Comment, UserFollowing
+from .models import Post, Files, UserProfile, Comment, UserFollowing, Notification
 from django.template.loader import render_to_string
 from .forms import PostForm, CommentPostForm, UserProfileForm
 from django.template.context_processors import csrf
@@ -19,7 +19,8 @@ import json
 from django.template.loader import render_to_string
 from django.db.models import Q
 from Connection.utils import get_forge_link_or_false, connectionRequestStatus
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 User = get_user_model()
 
 
@@ -32,7 +33,10 @@ class PostListView(LoginRequiredMixin, View):
         form = PostForm()
         commentForm = CommentPostForm()
         posts = Post.objects.all().order_by("-date_posted")
-        context = {"posts": posts, "form": form, "commentForm": commentForm}
+        followers = request.user.followers.count()
+        following = request.user.following.count()
+        context = {"posts": posts, "form": form, "commentForm": commentForm,
+                   'followers': followers, 'following': following, }
         return render(request, 'social/post-list.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -200,6 +204,7 @@ def JobsView(request):
 
 class CreateCommentPostView(View):
     def post(self, request, post_slug, *args, **kwargs):
+        current_user = request.user
         post = get_object_or_404(Post, post_slug=post_slug)
         form = CommentPostForm(request.POST or None)
         if is_ajax(request=request) and form.is_valid():
@@ -207,6 +212,26 @@ class CreateCommentPostView(View):
             comment_post.author = request.user
             comment_post.post = post
             comment_post.save()
+            # let's notfify the author of the post about the comment
+            channel_layer = get_channel_layer()
+            room_name = f"comment_or_post_listener_{post.author.id}"
+            new_notif = Notification.objects.create(
+                user_from=current_user,
+                user_to=post.author,
+                message="has commented on one of your posts",
+                type_off=3
+            )
+            async_to_sync(channel_layer.group_send)(
+                room_name,
+                {
+                    "type": "send_notification_to_post_author",
+                    "liker": current_user.username,
+                    "notification": "has liked your post",
+                    "avatar_url": current_user.profile.avatar.url,
+                    "date_notif": new_notif.date_sent,
+                    "notif_type": new_notif.type_off,
+                }
+            )
             jsonInstance = serializers.serialize(
                 "json",
                 [
@@ -233,11 +258,13 @@ class DeleteCommentPostView(View):
         return JsonResponse({"success": True, "post_slug": post_slug, })
 
 
-class AddRemovePostLikes(View):
+class AddRemovePostLikes(LoginRequiredMixin, View):
     def post(self, request, post_or_comment_slug, *args, **kwargs):
+        current_user = request.user
         if is_ajax(request=request):
             liked_a = request.POST.get("liked_a")
             is_liked = None
+            channel_layer = get_channel_layer()
             if liked_a == "comment":
                 comment = get_object_or_404(
                     Comment, comment_slug=post_or_comment_slug)
@@ -245,7 +272,8 @@ class AddRemovePostLikes(View):
                     username=request.user.username).exists()
                 if not is_liked:
                     comment.likes.add(request.user)
-                    comment.save()  # do not thing this step is necessary though
+                    comment.save()  # do not think this step is necessary though
+
                 else:
                     comment.likes.remove(request.user)
                     comment.save()
@@ -256,6 +284,25 @@ class AddRemovePostLikes(View):
                 if not is_liked:
                     post.likes.add(request.user)
                     post.save()
+                    # now let's handle the notification of comment author
+                    new_notif = Notification.objects.create(
+                        user_from=current_user,
+                        user_to=post.author,
+                        message="has liked one of your posts",
+                        type_off=2
+                    )
+                    room_name = f"comment_or_post_listener_{post.author.id}"
+                    async_to_sync(channel_layer.group_send)(
+                        room_name,
+                        {
+                            "type": "send_notification_to_post_author",
+                            "liker": current_user.username,
+                            "notification": "has liked your post",
+                            "avatar_url": current_user.profile.avatar.url,
+                            "date_notif": new_notif.date_sent,
+                            "notif_type": new_notif.type_off,
+                        }
+                    )
                 else:
                     post.likes.remove(request.user)
                     post.save()
@@ -307,38 +354,44 @@ class ConnectionsListView(LoginRequiredMixin, View):
         }
         return render(request, "connection/connectionslist.html", context)
 
-    # def test_func(self, request, *args, **kwargs):
-    #     print(kwargs)
-    #     # to check for later
-    #     return True
+        # do not think I will need to write a test func for this view
 
 
-class searchView(View):
+class searchView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
+        req_sender = None
         user_links = ConnectionsList.objects.get(user=user)
         q = request.GET.get("q")
+        ForgeLinkStatus = None
+        forgeLink_id = None
+
         found_users = User.objects.filter(
             Q(username__icontains=q) | Q(
                 email__icontains=q) | Q(profile__full_name__icontains=q)
         ).distinct()
         search_list_result = []
         for a_user in found_users:
-            search_list_result.append((a_user, user_links.areLinked(a_user)))
             if not user_links.areLinked(a_user):
                 are_connected = False  # they are not connected at all
                 if get_forge_link_or_false(sender=a_user, receiver=user) != False:
-                    # means they sent you a forge link CASE 3
+                    # means they sent you a forge link
+                    req_sender = a_user
                     ForgeLinkStatus = connectionRequestStatus.THEY_SENT_CON_REQUEST.value
                     forgeLink_id = get_forge_link_or_false(
                         sender=a_user, receiver=user).id
                     request_sender = a_user.username
                 elif get_forge_link_or_false(sender=user, receiver=a_user) != False:
-                    # means you sent them a forge link CASE 4
+                    # means you sent them a forge link
                     ForgeLinkStatus = connectionRequestStatus.YOU_SENT_CON_REQUEST.value
                     forgeLink_id = get_forge_link_or_false(
                         sender=user, receiver=a_user).id
-                else:  # means none of you sent the other a forget link CASE 5
+                else:  # means none of you sent the other a forget link
                     ForgeLinkStatus = connectionRequestStatus.NO_CON_REQUEST.value
-        context = {"found_users_list": search_list_result, }
+            search_list_result.append(
+                (a_user, user_links.areLinked(a_user), ForgeLinkStatus, forgeLink_id))
+        context = {
+            "found_users_list": search_list_result,
+            "req_sender": req_sender,
+        }
         return render(request, "social/search_result.html", context)

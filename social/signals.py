@@ -1,12 +1,15 @@
 from django.dispatch import receiver
 from django.db.models.signals import m2m_changed, pre_save, post_save
 from django.core.exceptions import ValidationError
-from .models import Post, UserProfile, Comment
+from .models import Post, UserProfile, Comment, Notification
 from django.contrib.auth.models import User
 import string
 import random
 import os
 from Connection.models import ConnectionsList
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync  # this will help to send the message
 
 
 def uniqueSlugDigit(instance, size=12, new_slug=None):
@@ -21,6 +24,28 @@ def uniqueSlugDigit(instance, size=12, new_slug=None):
                        string.ascii_uppercase + string.digits) for n in range(size)])
         return uniqueSlugDigit(instance, size=12, new_slug=slug)
     return slug
+
+
+@receiver(post_save, sender=Post)
+def send_notification_to_followers(sender, instance, created, *args, **kwargs):
+    if created:
+        channel_layer = get_channel_layer()
+        # create a notification
+        message = f"has published a new post"
+        # notif = Notification.objects.create(
+        #     user_from=instance.author, message=message)
+        followers_list_rooms = [
+            f"follower_user_{follower.user_id.id}" for follower in instance.author.followers.all()]
+        for follower_room in followers_list_rooms:
+            async_to_sync(channel_layer.group_send)(
+                follower_room,
+                {
+                    "type": "send_notification_to_followers",
+                    "notification_author": "CoreyMs",
+                    "notification": "has published a new post",
+                    "avatar_url": request.user.profile.avatar.url,
+                }
+            )
 
 
 @receiver(m2m_changed, sender=Post.images.through)

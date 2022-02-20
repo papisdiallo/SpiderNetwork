@@ -223,6 +223,17 @@ $(window).on("load", function () {
         $("#message").hide();
         $(".user-account-settingss").hide();
         $(this).next("#notification").toggle();
+        $(this).find(".notification").hide()
+        $.ajax({
+            url: "/connection/cleanUnreadNotif/",
+            type: "get",
+            data: { "type_of": "not_msg" },
+            success: function (data) {
+                if (data.success) {
+                };
+            },
+            error: function (error) { alert("there were an error") }
+        })
     });
 
     //  ============ Messages Open =============
@@ -231,6 +242,16 @@ $(window).on("load", function () {
         $("#notification").hide();
         $(".user-account-settingss").hide();
         $(this).next("#message").toggle();
+        $(this).find(".notification").hide()
+        $.ajax({
+            url: "/connection/cleanUnreadNotif/",
+            type: "get",
+            data: { "type_of": "msg" },
+            success: function (data) {
+                if (data.success) { };
+            },
+            error: function (error) { alert("there were an error") }
+        })
     });
 
 

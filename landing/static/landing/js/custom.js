@@ -44,11 +44,11 @@ $(document).ready(function () {
                     if (data.success) {
                         let message;
                         setTimeout(() => {
-                            $(e.target).next().fadeOut();
+                            $(e.target).next().fadeOut("slow");
                             // take care of the reset form for both later
                             ResetForm('createPostForm', 'PreviewImagesContainer')
                             $(`${_id}`).modal('hide');
-                            $(e.target.nextElementSibling).fadeOut()
+                            $(e.target.nextElementSibling).fadeOut("slow")
                             _id === "#UpdatePostModal" ? message = "Post has been updated" :
                                 message = "Post has been created"
                             alertUser(`${message}`, "successfully!")// alerting the user 
@@ -59,7 +59,7 @@ $(document).ready(function () {
                         $(`${_id} #createPostForm`).replaceWith(data.formErrors);
                         $(`${_id} .PreviewImagesContainer`).html("");
                         $(`${_id}`).find("form").attr("id", "createPostForm");
-                        $(e.target.nextElementSibling).fadeOut()
+                        $(e.target.nextElementSibling).fadeOut("slow")
                     };
 
                     $(e.target).prop("disabled", false);
@@ -78,7 +78,6 @@ $(document).ready(function () {
             var postImagesPreviewContainer = document.querySelector(`${_id} .PreviewImagesContainer`);
             $(`${_id} .maxFileError`).fadeOut()
             $(postImagesPreviewContainer).html("");
-            console.log($(e.target))
             if ($(e.target.files.length) > 5) {
                 $(`${_id} .maxFileError`).fadeIn()
                 return;
@@ -122,7 +121,7 @@ $(document).ready(function () {
                 $(postImagesPreviewContainer).append(row);
                 reader.readAsDataURL(file)
                 var image_input_div = document.querySelector(`${_id} #createPostForm #div_id_images`);
-                document.querySelector(`${_id} #createPostForm`).insertBefore($(postImagesPreviewContainer), image_input_div)
+                document.querySelector(`${_id} #createPostForm`).insertBefore(postImagesPreviewContainer, image_input_div)
             });
         })
     })
@@ -315,7 +314,6 @@ $(document).ready(function () {
                     data: _form_data,
                     dataType: "json",
                     success: (data) => {
-                        console.log(data.success)
                         if (data.success) {
                             $("#UserProfileModal").modal("hide")
                             $("#UserProfileForm")[0].reset();
@@ -455,7 +453,6 @@ $(document).ready(function () {
                 success: function (data) {
                     if (data.success) {
                         $(`#DeletePostModal`).modal('hide');
-                        console.log("this post should already deleted")
                         alertUser("Post", "has been deleted successfully");
                         $(".posts-section").find(`[data-slug=${post_slug}]`).fadeOut();
                     }
@@ -470,7 +467,8 @@ $(document).ready(function () {
     }
     function commentOnPost(e) {
         e.preventDefault();
-        e.target.setAttribute("disabled", true);
+        e.target.setAttribute("disabled", "true");
+        $(e.target.nextElementSibling).fadeIn()
         var _form = $(e.target).parent();
         var post_slug = _form.attr("data-slug");
         $.ajax({
@@ -480,40 +478,36 @@ $(document).ready(function () {
             success: function (data) {
                 if (data.success) {
                     var comment = JSON.parse(data.comment_obj)
-                    console.log(comment)
                     var _readable_date = dateFormating(comment[0].fields["date_commented"])
-                    console.log(_readable_date, "this is the readable date")
                     var date_commented = timeSince(_readable_date)
-                    console.log(typeof (_readable_date), "this is the type of the date")
-                    console.log(date_commented, "this is the date commented")
                     var commentUl = `
-                <ul class="comment_instance_${comment[0].pk}">
-                    <li>
-                        <div class="comment-list">
-                            <div class="bg-img">
-                                <img src="${data.imageUrl}" style="width: 40px;" alt="">
-                            </div>
-                            <div class="comment"> 
-                                <h3>${comment[0].fields["author"][0]}</h3>
-                                <div> 
-                                    <p>${comment[0].fields["content"]}</p>
-                                </div>
-                                <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
-                                <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> ${date_commented}</span>
-                                <button name="PostLike" data-slug="comment_like_${comment[0].fields['comment_slug']}" class="com-action com mx-0" style="padding: 1px 7px;">
-                                    <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
-                                    <span class="likes-count" style="display:inline;pointer-events:none;">0</span>
-                                </button>
-                                <span id="comment_delete_${comment[0].pk}" class="com-action">
-                                    <a data-bs-toggle="modal" data-slug="comment_${comment[0].pk}" href="#DeleteCommentPostModal"> 
-                                        <i class="fa fa-trash mx-1"></i>
-                                    </a>                               
-                                </span>
-                            </div>
-                        </div >           
-                    </li >
-                </ul >
-                `
+                        <ul class="comment_instance_${comment[0].pk}">
+                            <li>
+                                <div class="comment-list">
+                                    <div class="bg-img">
+                                        <img src="${data.imageUrl}" style="width: 40px;" alt="">
+                                    </div>
+                                    <div class="comment"> 
+                                        <h3>${comment[0].fields["author"][0]}</h3>
+                                        <div> 
+                                            <p>${comment[0].fields["content"]}</p>
+                                        </div>
+                                        <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
+                                        <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> ${date_commented}</span>
+                                        <button name="PostLike" data-slug="comment_like_${comment[0].fields['comment_slug']}" class="com-action com mx-0" style="padding: 1px 7px;">
+                                            <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
+                                            <span class="likes-count" style="display:inline;pointer-events:none;">0</span>
+                                        </button>
+                                        <span id="comment_delete_${comment[0].pk}" class="com-action">
+                                            <a data-bs-toggle="modal" data-slug="comment_${comment[0].pk}" href="#DeleteCommentPostModal"> 
+                                                <i class="fa fa-trash mx-1"></i>
+                                            </a>                               
+                                        </span>
+                                    </div>
+                                </div >           
+                            </li >
+                        </ul >
+                        `
                     var commentsContainer = $(`.post-comment-${post_slug}`)
                     if (commentsContainer.children().length === 1) {
                         var comment_section = document.createElement("div");
@@ -527,6 +521,7 @@ $(document).ready(function () {
                         $(commentsContainer).find(".comment-sec").append(commentUl)
                     }
                     $(e.target).prop("disabled", false);
+                    $(e.target.nextElementSibling).fadeOut("slow");
                     _form[0].reset();
                     var comments_count = $(`.${post_slug}_comments_count`).text()
                     $(`.${post_slug}_comments_count`).text(parseInt(comments_count) + 1)
@@ -542,10 +537,7 @@ $(document).ready(function () {
 
     }
     function DeleteCommentPost(e) {
-        console.log("the delete comment post ran")
         var data_slug = $(e.target).attr("data-slug").split("_").at(-1);
-        console.log(data_slug)
-        console.log(e.target)
         var url = `/social/delete-comment-post/${data_slug}/`
         console.log(url)
         $("#DeleteCommentPostModal").on("click", (ev) => {
@@ -563,7 +555,7 @@ $(document).ready(function () {
                         var comments_count = $(`.${data.post_slug}_comments_count`).text()
                         $(`.${data.post_slug}_comments_count`).text(parseInt(comments_count) - 1)
                         alertUser("Comment", "has been deleted successfully");
-                        $(`.comment_instance_${data_slug}`).fadeOut();
+                        $(`.comment_instance_${data_slug}`).fadeOut("slow");
                     }
                 },
                 error: function (error) {
@@ -592,12 +584,9 @@ $(document).ready(function () {
 
     function PostLike(e) {
         $(e.target).attr("disabled", true)
-        console.log("the post like function ran");
         var post_slug = $(e.target).attr("data-slug").split("_")
         var slug = post_slug.at(-1)
         var liked_a = post_slug[0]
-        console.log(liked_a)
-        console.log(slug);
         var url = `/social/like-post/${slug}/`
         data = { "liked_a": liked_a }
         $.ajax({
@@ -608,7 +597,6 @@ $(document).ready(function () {
             headers: { 'X-CSRFToken': csrftoken },
             mode: 'same-origin',// Do not send CSRF token to another domain.
             success: function (data) {
-                console.log(data.is_liked)
                 var _icon = e.target.firstElementChild
                 var likes_count = $(e.target).find(".likes-count").text()
                 if (data.is_liked) {
@@ -631,7 +619,6 @@ $(document).ready(function () {
     function cancelForgeLink(e) {
         var profile_slug = $(e.target).attr("profile-slug") ? $(e.target).attr("profile-slug") :
             (window.location.pathname).split("/").at(-2)
-        console.log(profile_slug)
         data = { "profile_slug": profile_slug, "csrfmiddlewaretoken": csrftoken, }
         $.ajax({
             url: "/connection/cancel-forge-link/",
@@ -639,7 +626,6 @@ $(document).ready(function () {
             type: "post",
             dataType: "json",
             success: (data) => {
-                console.log(data)
                 if (data.success) {
                     console.log("ok");
                     alertUser("Your request to forge a link", "has been cancelled successfully!")
@@ -655,10 +641,10 @@ $(document).ready(function () {
         })
     }
     function ForgeNewLink(e) {
-        $(e.target).attr("disabled", true)
+        $(e.target).attr("disabled", "true");
+        $(e.target).css({ "cursor": "not-allowed" })
         var profile_slug = $(e.target).attr("profile-slug") ? $(e.target).attr("profile-slug") :
             (window.location.pathname).split("/").at(-2)
-        console.log(profile_slug)
         data = { "profile_slug": profile_slug, "csrfmiddlewaretoken": csrftoken, }
         $.ajax({
             url: "/connection/sending-link-forge/",
@@ -672,7 +658,9 @@ $(document).ready(function () {
                     (e.target.id) ? $(e.target).attr("id", "CancelLinkForge") :
                         $(e.target).attr("data-role", "CancelLinkForge")
                     $(e.target).text("Cancel connection request")
-                    $(e.target).prop("disabled", false)
+                    $(e.target).prop("disabled", "false")
+                    $(e.target).css({ "cursor": "pointer" })
+
                     alertUser(`Your Request to forge a link has been sent successfully to`, `${data.profile_owner}`)
                 }
 

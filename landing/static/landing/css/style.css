@@ -863,7 +863,15 @@ nav ul ul li a {
 }
 .notification-box.msg .nott-list .notification-info span {
   bottom: auto;
-  top: 5px;
+  top: 23px;
+}
+.not-box-open, .not-box-openm {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02rem !important;
+  transition: all ease 0.3s !important;
+  cursor: pointer !important
 }
 .notification-box.msg .notification-info h3 {
   margin-bottom: 1px;
@@ -880,6 +888,8 @@ nav ul ul li a {
   opacity: 1;
   visibility: visible;
   z-index: 999;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
   display: none;
 }
 .notification-box.active {
@@ -910,7 +920,7 @@ nav ul ul li a {
   width: 100%;
 }
 .nott-list .notification-info {
-  width: 86%;
+  width: 80%;
   float: left;
   text-align: left;
   position: relative;
@@ -1418,6 +1428,7 @@ main {
 .user-picy img {
   width: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 .post-st {
   float: right;
@@ -2486,6 +2497,10 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
+.not-box-open .notification {
+  right: 32px !important;
+}
+
 
 .inp-field {
   float: left;
@@ -2507,7 +2522,7 @@ select {
 /* ================= sign-in ================ */
 
 .sign-in {
-  background-color: #e75348;
+  background-color: #42132a;
 }
 .sign-in-page {
   float: left;
@@ -2747,10 +2762,34 @@ select {
 .sign_in_sec form input {
   height: 40px;
 }
+.notification {
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: .2;
+  top: 6px;
+  position: absolute;
+  right: 21px;
+}
+.button.secondaryAction {
+  float: right;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  bottom: 35px;
+}
+#id_remember {
+  padding: 0;
+  height: 16px;
+  margin-top: 0;
+  /* margin-left: 0px; */
+  font-size: 12px;
+}
 .sign_in_sec form input,
 .sign_in_sec form select {
   width: 100%;
-  padding: 0 15px 0 40px;
+  padding: 0 15px;
   color: #b2b2b2;
   font-size: 14px;
   border: 1px solid #e5e5e5;
@@ -5133,10 +5172,13 @@ a:hover {
 }
 .noty-user-img {
   float: left;
-  width: 35px;
+  width: 45px;
 }
 .noty-user-img img {
   width: 100%;
+  height: 45px;
+  border-radius: 50%;
+  margin-right: 5px;
 }
 .notification-info {
   float: left;
