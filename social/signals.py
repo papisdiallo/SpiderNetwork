@@ -64,7 +64,6 @@ def post_unique_slug(sender, instance, *args, **kwargs):
 @receiver(post_save, sender=Comment)
 def comment_unique_slug(sender, instance, created, *args, **kwargs):
     if created:
-        print(instance.id)
         instance.comment_slug = "".join([random.choice(string.ascii_lowercase +
                                         string.ascii_uppercase + string.digits) for n in range(10)]) + str(instance.id)
         instance.save()

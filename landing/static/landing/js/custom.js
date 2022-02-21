@@ -478,8 +478,8 @@ $(document).ready(function () {
             success: function (data) {
                 if (data.success) {
                     var comment = JSON.parse(data.comment_obj)
-                    var _readable_date = dateFormating(comment[0].fields["date_commented"])
-                    var date_commented = timeSince(_readable_date)
+                    var date_commented = timeSince(comment[0].fields["date_commented"])
+                    console.log("this is the date commented after js", date_commented)
                     var commentUl = `
                         <ul class="comment_instance_${comment[0].pk}">
                             <li>
@@ -493,7 +493,8 @@ $(document).ready(function () {
                                             <p>${comment[0].fields["content"]}</p>
                                         </div>
                                         <a href="#" title="" class="active"><i class="fa fa-reply-all"></i>Reply</a>
-                                        <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span> ${date_commented}</span>
+                                        <span style="display:inline;"><i class="fa fa-clock mx-1"></i></span>
+                                        <span style="display:inline";> ${date_commented}</span>
                                         <button name="PostLike" data-slug="comment_like_${comment[0].fields['comment_slug']}" class="com-action com mx-0" style="padding: 1px 7px;">
                                             <i class="far fa-thumbs-up" style="pointer-events: none;"></i>
                                             <span class="likes-count" style="display:inline;pointer-events:none;">0</span>
@@ -781,12 +782,12 @@ $(document).ready(function () {
         if (interval > 1) {
             return Math.floor(interval) + " minutes ago";
         }
-        return Math.floor(seconds) + " seconds ago";
+        return "just now";
     }
     // this function will change the formation of the javascript object to a more human readable date
     function dateFormating(dateObj, hours = false) {
         var options1 = { "month": 'numeric', "day": 'numeric', "year": 'numeric', }
-        var options2 = { "month": 'short', "day": 'numeric', "year": 'numeric', "hour": 'numeric', "minute": 'numeric', }
+        var options2 = { "month": 'numeric', "day": 'numeric', "year": 'numeric', "hour": 'numeric', "minute": 'numeric', }
         var dateTimeFormat = Intl.DateTimeFormat('default',);
 
         if (dateObj === null) {
