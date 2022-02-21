@@ -1,5 +1,16 @@
 $(document).ready(function () {
 
+    function scrollSmoothToBottom(id) {
+        var div = document.getElementById(id);
+        if (div !== null) {
+
+            $('#' + id).animate({
+                scrollTop: div.scrollHeight - div.clientHeight
+            }, 300);
+        }
+    }
+    scrollSmoothToBottom("messages-container");
+
     let _id;
     let _username
     var _id_ = document.getElementById("other_user_id")
@@ -41,6 +52,7 @@ $(document).ready(function () {
                 </div>
              `
             $(".messages-line").append(msg_div);
+            scrollSmoothToBottom("messages-container");
         }
         socket.onerror = (e) => {
             console.log("there is an error", e)

@@ -128,6 +128,7 @@ $(document).ready(function () {
 
     // ################ Events listeners here ###################
     $(".posts-section").on("click", (e) => {
+        console.log(e.target.classList, "this is the class list")
         if (!(e.target.href) && !(e.target.name)) return;
         if (e.target.href) {
             if ((e.target.href).split("/").at(-1) === "#UpdatePostModal") return GetUpdatePost(e);
@@ -167,7 +168,6 @@ $(document).ready(function () {
     })
 
     // #################### function sections here ################
-
     function setImageProperties(image, x, y, width, height) {
         imageString = image;
         cropX = x;
@@ -641,7 +641,7 @@ $(document).ready(function () {
         })
     }
     function ForgeNewLink(e) {
-        $(e.target).attr("disabled", "true");
+        $(e.target).attr("disabled", true);
         $(e.target).css({ "cursor": "not-allowed" })
         var profile_slug = $(e.target).attr("profile-slug") ? $(e.target).attr("profile-slug") :
             (window.location.pathname).split("/").at(-2)
@@ -694,6 +694,7 @@ $(document).ready(function () {
     }
     function acceptLinkForge(e) {
         $(e.target).attr("disabled", true)
+        $(e.target).css({ "cursor": "not-allowed" })
         var request_id = $(e.target).attr("data-request-id")
         data = { "request_id": request_id, "csrfmiddlewaretoken": csrftoken, }
         $.ajax({
@@ -716,9 +717,12 @@ $(document).ready(function () {
                         ul_parent.replaceWith(_accepted);
                     }
                     alertUser("You and ", `${data.sender} are now connected`)
+                    $(e.target).prop("disabled", false)
+                    $(e.target).css({ "cursor": "pointer" })
                 } else {
                     alert(data.error)
                     $(e.target).prop("disabled", false)
+                    $(e.target).css({ "cursor": "pointer" })
                 }
             }
         })

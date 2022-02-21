@@ -13,7 +13,7 @@ MESSAGE_TAGS = {
 
 def allowedToChatWith(func_view):
     def wrapper_func(request, username, *args, **kwargs):
-        other_user = get_object_or_40(User, username=username)
+        other_user = get_object_or_404(User, username=username)
         user = request.user
         user_con = ConnectionsList.objects.get(user=user)
         if not user_con.areLinked(other_user):

@@ -31,25 +31,25 @@ $(window).on("load", function () {
 
     //  ============= SIGNIN CONTROL FUNCTION =========
 
-    $('.sign-control li').on("click", function () {
-        var tab_id = $(this).attr('data-tab');
-        $('.sign-control li').removeClass('current');
-        $('.sign_in_sec').removeClass('current');
-        $(this).addClass('current animated fadeIn');
-        $("#" + tab_id).addClass('current animated fadeIn');
-        return false;
-    });
+    // $('.sign-control li').on("click", function () {
+    //     var tab_id = $(this).attr('data-tab');
+    //     $('.sign-control li').removeClass('current');
+    //     $('.sign_in_sec').removeClass('current');
+    //     $(this).addClass('current animated fadeIn');
+    //     $("#" + tab_id).addClass('current animated fadeIn');
+    //     return false;
+    // });
 
     //  ============= SIGNIN TAB FUNCTIONALITY =========
 
-    $('.signup-tab ul li').on("click", function () {
-        var tab_id = $(this).attr('data-tab');
-        $('.signup-tab ul li').removeClass('current');
-        $('.dff-tab').removeClass('current');
-        $(this).addClass('current animated fadeIn');
-        $("#" + tab_id).addClass('current animated fadeIn');
-        return false;
-    });
+    // $('.signup-tab ul li').on("click", function () {
+    //     var tab_id = $(this).attr('data-tab');
+    //     $('.signup-tab ul li').removeClass('current');
+    //     $('.dff-tab').removeClass('current');
+    //     $(this).addClass('current animated fadeIn');
+    //     $("#" + tab_id).addClass('current animated fadeIn');
+    //     return false;
+    // });
 
     //  ============= SIGNIN SWITCH TAB FUNCTIONALITY =========
 
@@ -202,11 +202,21 @@ $(window).on("load", function () {
 
     //  ================== Edit Options Function =================
 
+    $(".posts-section").on("click", (e) => {
+        if (e.target.classList.contains("fa-ellipsis-v")) {
+            $(".ed-opts-open").on("click", function () {
+                $(this).next(".ed-options").toggleClass("active");
+                return false;
+            });
+        } else {
+            console.log("not the element")
+        }
 
-    $(".ed-opts-open").on("click", function () {
-        $(this).next(".ed-options").toggleClass("active");
-        return false;
     });
+    // $(".ed-opts-open").on("click", function () {
+    //     $(this).next(".ed-options").toggleClass("active");
+    //     return false;
+    // });
 
 
     // ============== Menu Script =============

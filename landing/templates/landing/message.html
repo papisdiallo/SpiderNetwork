@@ -64,7 +64,7 @@
 </div>
 <a href="#" title=""><i class="fa fa-ellipsis-v"></i></a>
 </div>
-<div class="messages-line">
+<div class="messages-line" id="messages-container">
     {% for message in msges %}
         {% if message.sender == request.user %}
         <div class="main-message-box st3">

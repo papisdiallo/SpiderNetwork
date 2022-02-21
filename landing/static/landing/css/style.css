@@ -865,6 +865,15 @@ nav ul ul li a {
   bottom: auto;
   top: 23px;
 }
+#div_id_avatar .custom-file-input::before {
+    content: "Select an image profile";
+}
+#div_id_avatar span.input-group-text,
+#div_id_avatar label.requiredField,
+#div_id_avatar .input-group.mb-2 {
+  display: none;
+}
+
 .not-box-open, .not-box-openm {
   color: #ffffff !important;
   font-size: 15px !important;
@@ -2603,6 +2612,10 @@ select {
 }
 .cm-logo img {
   margin-bottom: 30px;
+  width: 200px;
+  float: none;
+  height: 200px;
+  margin-left: 50px;
 }
 .cm-logo > p {
   color: #666666;
